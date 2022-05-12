@@ -6,11 +6,14 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Tweet_App_API.Model;
+using Tweet_App_API.Services;
 
 namespace Tweet_App_API
 {
@@ -27,11 +30,22 @@ namespace Tweet_App_API
         public void ConfigureServices(IServiceCollection services)
         {
 
-            services.AddControllers();
+           
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Tweet_App_API", Version = "v1" });
             });
+
+            services.Configure<TweetAppDBSettings>(
+        Configuration.GetSection(nameof(TweetAppDBSettings)));
+
+            services.AddSingleton<ITweetAppDBSettings>(sp =>
+                sp.GetRequiredService<IOptions<TweetAppDBSettings>>().Value);
+
+
+            services.AddSingleton<UserServices>();
+
+            services.AddControllers();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
