@@ -11,24 +11,16 @@ namespace Tweet_App_API.DataBaseLayer
     public class DBClient : IDBClient
     {
         private readonly IMongoCollection<User> _users;
+        private readonly IMongoCollection<Tweet> _tweets;
 
         public DBClient(ITweetAppDBSettings settings)
         {
             var client = new MongoClient(settings.ConnectionString);
             var database = client.GetDatabase(settings.DatabaseName);
 
-            var collectionList = database.ListCollectionNames().ToList();
+            _users = GetDBCollection<User>(database, settings.UserCollectionName);
 
-            var isExisit = collectionList.Any(x => x == settings.UserCollectionName);
-
-            if (!isExisit)
-            {
-                database.CreateCollection(settings.UserCollectionName);
-            }
-             
-            
-            
-            _users = database.GetCollection<User>(settings.UserCollectionName);
+            _tweets = GetDBCollection<Tweet>(database, settings.TweetCollectionName);
 
             var options = new CreateIndexOptions { Unique = true };
 
@@ -40,5 +32,26 @@ namespace Tweet_App_API.DataBaseLayer
         {
             return _users;
         }
+
+        public IMongoCollection<Tweet> GetTweetCollection()
+        {
+            return _tweets;
+        }
+
+        public static IMongoCollection<T> GetDBCollection<T>(IMongoDatabase database,string collectionName)
+        {
+            var collectionList = database.ListCollectionNames().ToList();
+
+            var isExisit = collectionList.Any(x => x == collectionName);
+
+            if (!isExisit)
+            {
+                database.CreateCollection(collectionName);
+            }
+
+            return database.GetCollection<T>(collectionName);
+        }
+
+      
     }
 }

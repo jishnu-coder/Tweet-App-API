@@ -9,6 +9,9 @@ namespace Tweet_App_API.Model
     [BsonIgnoreExtraElements]
     public class User
     {
+        [BsonId]
+        public ObjectId id { get; set; }
+
         [BsonRequired]
         [BsonElement("firstName")]
         public string FirstName { get; set; }
@@ -34,11 +37,6 @@ namespace Tweet_App_API.Model
         [BsonElement("contactNumber")]
         public string ContactNumber { get; set; }
 
-    }
-
-    public class Test
-    {
-        public string  sample { get; set; }
     }
 
 }

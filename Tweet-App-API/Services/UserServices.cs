@@ -1,4 +1,5 @@
-﻿using MongoDB.Driver;
+﻿using MongoDB.Bson;
+using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,7 +26,7 @@ namespace Tweet_App_API.Services
             return users;
         }
 
-        public User Get(string id) =>
+        public User GetUserById(string id) =>
             _users.Find<User>(emp => emp.LoginId == id).FirstOrDefault();
 
         public User Post(User usr)
@@ -51,6 +52,20 @@ namespace Tweet_App_API.Services
             return null;
         }
 
+        public User ResetPassword(string userId, string newPassword)
+        {
+            var user = GetUserById(userId);
+            if (user != null)
+            {
+                var hashPassword = CryptoGraphy.GetHash(newPassword);
+                var filter = new BsonDocument("loginId", userId);
+                var update = Builders<User>.Update.Set("password", hashPassword);
+                var result = _users.FindOneAndUpdate(filter, update);
+                return user;
+            }
+
+            return null;
+        }
     }
 }
 

@@ -46,6 +46,7 @@ namespace Tweet_App_API
 
             services.AddSingleton<IDBClient, DBClient>();
             services.AddSingleton<IUserServices, UserServices>();
+            services.AddSingleton<ITweetService, TweetService>();
 
             services.AddControllers();
         }

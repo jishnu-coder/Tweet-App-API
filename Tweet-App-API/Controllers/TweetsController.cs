@@ -16,13 +16,15 @@ namespace Tweet_App_API.Controllers
     {
         private readonly ILogger<TweetsController> _logger;
         private readonly IUserServices _userService;
+        private readonly ITweetService _tweetService;
 
         public static List<User> userList = new List<User>();
 
-        public TweetsController(ILogger<TweetsController> logger, IUserServices userServices)
+        public TweetsController(ILogger<TweetsController> logger, IUserServices userServices , ITweetService tweetService)
         {
             _logger = logger;
             _userService = userServices;
+            _tweetService = tweetService;
         }
 
         [HttpPost("Register")]
@@ -38,10 +40,24 @@ namespace Tweet_App_API.Controllers
             var result = _userService.LoginUser(loginId, password);
             return result;
         }
+
+        [HttpGet("{userId}/forget-Password")]
+        public User ResetPassWord(string userId,string newPassword)
+        {
+            return _userService.ResetPassword(userId, newPassword);
+        }
+        
+
         [HttpGet]
         public List<User> GetAll()
         {
             return _userService.Get();
+        }
+
+        [HttpPost("{userid}/Add")]
+        public Tweet CreateTweet(Tweet tweet)
+        {
+            return _tweetService.PostTweet(tweet);
         }
 
     }
