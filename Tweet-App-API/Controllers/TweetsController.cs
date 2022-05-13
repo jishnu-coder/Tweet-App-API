@@ -15,11 +15,11 @@ namespace Tweet_App_API.Controllers
     public class TweetsController : ControllerBase
     {
         private readonly ILogger<TweetsController> _logger;
-        private readonly UserServices _userService;
+        private readonly IUserServices _userService;
 
         public static List<User> userList = new List<User>();
 
-        public TweetsController(ILogger<TweetsController> logger, UserServices userServices)
+        public TweetsController(ILogger<TweetsController> logger, IUserServices userServices)
         {
             _logger = logger;
             _userService = userServices;
@@ -32,6 +32,12 @@ namespace Tweet_App_API.Controllers
             return user;
         }
 
+        [HttpGet("Login")]
+        public User Login(string loginId,string password)
+        {
+            var result = _userService.LoginUser(loginId, password);
+            return result;
+        }
         [HttpGet]
         public List<User> GetAll()
         {

@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Tweet_App_API.DataBaseLayer;
 using Tweet_App_API.Model;
 using Tweet_App_API.Services;
 
@@ -37,13 +38,14 @@ namespace Tweet_App_API
             });
 
             services.Configure<TweetAppDBSettings>(
-        Configuration.GetSection(nameof(TweetAppDBSettings)));
+            Configuration.GetSection(nameof(TweetAppDBSettings)));
 
             services.AddSingleton<ITweetAppDBSettings>(sp =>
                 sp.GetRequiredService<IOptions<TweetAppDBSettings>>().Value);
 
 
-            services.AddSingleton<UserServices>();
+            services.AddSingleton<IDBClient, DBClient>();
+            services.AddSingleton<IUserServices, UserServices>();
 
             services.AddControllers();
         }
