@@ -10,7 +10,7 @@ namespace Tweet_App_API.Model
     public class User
     {
         [BsonId]
-        public ObjectId id { get; set; }
+        public ObjectId id { get; set; } = ObjectId.GenerateNewId();
 
         [BsonRequired]
         [BsonElement("firstName")]

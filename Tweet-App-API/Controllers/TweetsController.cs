@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Tweet_App_API.Model;
 using Tweet_App_API.Services;
+using MongoDB.Driver;
 
 namespace Tweet_App_API.Controllers
 {
@@ -28,10 +29,9 @@ namespace Tweet_App_API.Controllers
         }
 
         [HttpPost("Register")]
-        public User Register(User user)
+        public async Task<UserResponse> Register(User user)
         {
-            _userService.Post(user);
-            return user;
+            return await _userService.Register(user);            
         }
 
         [HttpGet("Login")]
@@ -48,11 +48,18 @@ namespace Tweet_App_API.Controllers
         }
         
 
-        [HttpGet]
+        [HttpGet("users/all")]
         public List<User> GetAll()
         {
             return _userService.Get();
         }
+
+        [HttpGet("search/{username}")]
+        public List<User> GetUserByName(string username)
+        {
+            return _userService.GetUserById(username);
+        }
+
 
         [HttpPost("{userid}/Add")]
         public Tweet CreateTweet(Tweet tweet)
@@ -60,5 +67,40 @@ namespace Tweet_App_API.Controllers
             return _tweetService.PostTweet(tweet);
         }
 
+        [HttpGet("all")]
+        public List<Tweet> GetAllTweet()
+        {
+            return _tweetService.GetAll(); 
+        }
+
+        [HttpGet("{userid}")]
+        public List<Tweet> GetTweetById(string userid)
+        {
+            return _tweetService.GetByUserId(userid);
+        }
+
+        [HttpPut("{userid}/update/{id}")]
+        public async Task<Tweet> UpdateTweet(string userid,string id , Tweet tweet)
+        {
+            return await _tweetService.UpdateTweet(id, tweet);
+        }
+
+        [HttpDelete("{userid}/delete/{id}")]
+        public async Task<DeleteResult> DeleteTweet(string userid, string id)
+        {
+            return await _tweetService.DeleteTweet(id);
+        }
+
+        [HttpPut("{userid}/Like/{id}")]
+        public async Task<Tweet> LikeTweet(string userid, string id)
+        {
+            return await _tweetService.LikeTweet(userid,id);
+        }
+
+        [HttpPost("{userid}/reply/{id}")]
+        public async Task<Tweet> ReplyTweet(string userid, string id , TweetReply tweetReply)
+        {
+            return await _tweetService.ReplyTweet(userid, id ,tweetReply);
+        }
     }
 }
