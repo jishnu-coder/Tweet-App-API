@@ -29,7 +29,7 @@ namespace Tweet_App_API.Model
         public DateTime CreateTime { get; set; }
 
       
-        [BsonElement("tag")]
+        [BsonElement("tags")]
         public List<string> Tags { get; set; }
 
         [BsonElement("likes")]

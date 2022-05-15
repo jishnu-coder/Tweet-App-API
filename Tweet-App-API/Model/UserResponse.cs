@@ -11,6 +11,10 @@ namespace Tweet_App_API.Model
 
         public string Email { get; set; }
 
+        public string Token { get; set; }
+
+        public string RefreshToken { get; set; }
+
         public List<string> Errors { get; set; }        
     }
 }

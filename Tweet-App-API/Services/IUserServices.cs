@@ -14,8 +14,8 @@ namespace Tweet_App_API.Services
 
         public Task<UserResponse> Register(User usr);
 
-        public User LoginUser(string loginId, string password);
+        public Task<UserResponse> LoginUser(string loginId, string password);
 
-        public User ResetPassword(string userId, string newPassword);
+        public bool ResetPassword(string userId, string newPassword);
     }
 }

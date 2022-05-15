@@ -6,17 +6,20 @@ using System.Linq;
 using System.Threading.Tasks;
 using Tweet_App_API.DataBaseLayer;
 using Tweet_App_API.Model;
+using Tweet_App_API.TokenHandler;
 
 namespace Tweet_App_API.Services
 {
     public class UserServices : IUserServices
     {
         private readonly IMongoCollection<User> _users;
+        private  GetAccessTokenClass accessClass;
+
         //private readonly IMongoCollection<Test> _test;
         public UserServices(IDBClient client)
         {
             _users = client.GetUserCollection();
-
+            accessClass = new GetAccessTokenClass();
         }
 
         public List<User> Get()
@@ -38,6 +41,9 @@ namespace Tweet_App_API.Services
                 //Hash the password
                 usr.Password = CryptoGraphy.GetHash(usr.Password);
                 await _users.InsertOneAsync(usr);
+                var tokenContainer = await accessClass.GetAccessToken(usr.LoginId, usr.Email, usr.Password);
+                responsse.Token = tokenContainer.Token;
+                responsse.RefreshToken = tokenContainer.RefreshToken;
             }
             catch (Exception ex)
             {
@@ -56,9 +62,20 @@ namespace Tweet_App_API.Services
             return responsse;
         }
 
-        public User LoginUser(string loginId,string password)
+        public async Task<UserResponse> LoginUser(string loginId,string password)
         {
             var user =_users.Find<User>(emp => emp.LoginId == loginId).FirstOrDefault();
+
+            var userResponse = new UserResponse() { Errors = new List<string>() };
+
+            if (user == null)
+            {
+                userResponse.Errors.Add("Invalid Log in ID");
+                return userResponse;
+            }
+
+            userResponse.Email = user.Email;
+            userResponse.LoginId = user.LoginId;
 
             var newHashValue = CryptoGraphy.GetHash(password);
 
@@ -66,12 +83,17 @@ namespace Tweet_App_API.Services
 
             if(CryptoGraphy.CompareHash(newHashValue, user.Password))
             {
-                return user;
+               var tokenResponse = await accessClass.GetAccessToken(user.LoginId, user.Email, user.Password);
+                userResponse.Token = tokenResponse.Token;
+                userResponse.RefreshToken = tokenResponse.RefreshToken;
+                return userResponse;
             }
-            return null;
+
+            userResponse.Errors.Add("Incorrect Pssword");
+            return userResponse;
         }
 
-        public User ResetPassword(string userId, string newPassword)
+        public bool ResetPassword(string userId, string newPassword)
         {
             var user = GetUserById(userId);
             if (user[0] != null)
@@ -80,10 +102,10 @@ namespace Tweet_App_API.Services
                 var filter = new BsonDocument("loginId", userId);
                 var update = Builders<User>.Update.Set("password", hashPassword);
                 var result = _users.FindOneAndUpdate(filter, update);
-                return user[0];
+                return true;
             }
 
-            return null;
+            return false;
         }
     }
 }

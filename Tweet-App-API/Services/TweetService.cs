@@ -22,6 +22,11 @@ namespace Tweet_App_API.Services
         {
             //Add Guid as tweet id
             tweet.TweetId = Guid.NewGuid().ToString();
+            tweet.CreateTime = DateTime.Now;
+
+            tweet.Likes = tweet.Likes == null ? new List<string>() { } : tweet.Likes;
+            tweet.Tags = tweet.Tags == null ? new List<string>() { } : tweet.Tags;
+            tweet.Replys = tweet.Replys == null ? new List<TweetReply>() { } : tweet.Replys;
 
             _tweet.InsertOne(tweet);
             return tweet;
@@ -39,6 +44,7 @@ namespace Tweet_App_API.Services
 
         public async  Task<Tweet> UpdateTweet(string tweetid, Tweet tweet)
         {
+            tweet.CreateTime = DateTime.Now;
             var filter = new BsonDocument("tweetId", tweet.TweetId);
             var update = Builders<Tweet>.Update.Set("content", tweet.Content).
                        Set("tags", tweet.Tags).Set("createTime", tweet.CreateTime);
@@ -60,16 +66,22 @@ namespace Tweet_App_API.Services
 
         public async Task<Tweet> LikeTweet(string userId,string tweetId)
         {
-          
-            var filter = new BsonDocument("tweetId", tweetId);
-            var update = Builders<Tweet>.Update.AddToSet("likes", userId);
-                     
-            return await _tweet.FindOneAndUpdateAsync<Tweet>(filter, update);
+            var tweet = GetTweetByTweetId(tweetId);
+            if(!tweet.Likes.Contains(userId))
+            {
+                var filter = new BsonDocument("tweetId", tweetId);
+                var update = Builders<Tweet>.Update.AddToSet("likes", userId);
+
+                return await _tweet.FindOneAndUpdateAsync<Tweet>(filter, update);
+            }
+
+            return tweet;
+           
         }
 
         public async Task<Tweet> ReplyTweet(string userId, string tweetId , TweetReply replyTweet)
         {
-
+            replyTweet.Reply_Time = DateTime.Now;
             var filter = new BsonDocument("tweetId", tweetId);
             var update = Builders<Tweet>.Update.AddToSet("replys", replyTweet);
 

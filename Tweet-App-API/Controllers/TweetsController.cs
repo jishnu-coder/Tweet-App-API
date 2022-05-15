@@ -8,9 +8,13 @@ using System.Threading.Tasks;
 using Tweet_App_API.Model;
 using Tweet_App_API.Services;
 using MongoDB.Driver;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using System.Security.Claims;
 
 namespace Tweet_App_API.Controllers
 {
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Route("[controller]")]
     [ApiController]
     public class TweetsController : ControllerBase
@@ -28,39 +32,49 @@ namespace Tweet_App_API.Controllers
             _tweetService = tweetService;
         }
 
+        [AllowAnonymous]
         [HttpPost("Register")]
-        public async Task<UserResponse> Register(User user)
+        public async Task<IActionResult> Register(User user)
         {
-            return await _userService.Register(user);            
+            var result = await _userService.Register(user);
+            return Ok(result);
         }
 
+        [AllowAnonymous]
         [HttpGet("Login")]
-        public User Login(string loginId,string password)
+        public async Task<IActionResult> Login(string loginId,string password)
         {
-            var result = _userService.LoginUser(loginId, password);
-            return result;
+            var result = await _userService.LoginUser(loginId, password);
+            return Ok(result);
         }
 
         [HttpGet("{userId}/forget-Password")]
-        public User ResetPassWord(string userId,string newPassword)
+        public string ResetPassWord(string userId,string newPassword)
         {
-            return _userService.ResetPassword(userId, newPassword);
+            if( _userService.ResetPassword(userId, newPassword))
+            {
+                return "Password Successfully Changed";
+            }
+
+            return "Login Id Incorrect";
+
         }
         
-
+        
         [HttpGet("users/all")]
-        public List<User> GetAll()
+        public IActionResult GetAll()
         {
-            return _userService.Get();
+            return Ok(_userService.Get());
         }
 
         [HttpGet("search/{username}")]
-        public List<User> GetUserByName(string username)
-        {
-            return _userService.GetUserById(username);
+        public IActionResult GetUserByName(string username)
+        {            
+            return  Ok(_userService.GetUserById(username));
         }
 
-
+        [Authorize]
+        [Authorize(Policy = "whocanedit")]
         [HttpPost("{userid}/Add")]
         public Tweet CreateTweet(Tweet tweet)
         {
@@ -79,12 +93,18 @@ namespace Tweet_App_API.Controllers
             return _tweetService.GetByUserId(userid);
         }
 
+        [Authorize]
+        [Authorize(Policy = "whocanedit")]    
         [HttpPut("{userid}/update/{id}")]
-        public async Task<Tweet> UpdateTweet(string userid,string id , Tweet tweet)
+        public async Task<IActionResult> UpdateTweet(string userid,string id , Tweet tweet)
         {
-            return await _tweetService.UpdateTweet(id, tweet);
+            //string userId = User.Claims.First().Value;
+            var result = await _tweetService.UpdateTweet(id, tweet);
+            return Ok(result);
         }
 
+        [Authorize]
+        [Authorize(Policy = "whocanedit")]
         [HttpDelete("{userid}/delete/{id}")]
         public async Task<DeleteResult> DeleteTweet(string userid, string id)
         {
