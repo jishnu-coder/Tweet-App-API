@@ -57,14 +57,13 @@ namespace Tweet_App_API.Controllers
             }
 
             return "Login Id Incorrect";
-
         }
         
         
         [HttpGet("users/all")]
-        public IActionResult GetAll()
+        public async Task<IActionResult> GetAll()
         {
-            return Ok(_userService.Get());
+            return Ok( await _userService.Get());
         }
 
         [HttpGet("search/{username}")]
@@ -73,7 +72,7 @@ namespace Tweet_App_API.Controllers
             return  Ok(_userService.GetUserById(username));
         }
 
-        [Authorize]
+       
         [Authorize(Policy = "whocanedit")]
         [HttpPost("{userid}/Add")]
         public Tweet CreateTweet(Tweet tweet)
@@ -93,7 +92,7 @@ namespace Tweet_App_API.Controllers
             return _tweetService.GetByUserId(userid);
         }
 
-        [Authorize]
+       
         [Authorize(Policy = "whocanedit")]    
         [HttpPut("{userid}/update/{id}")]
         public async Task<IActionResult> UpdateTweet(string userid,string id , Tweet tweet)
@@ -103,7 +102,7 @@ namespace Tweet_App_API.Controllers
             return Ok(result);
         }
 
-        [Authorize]
+      
         [Authorize(Policy = "whocanedit")]
         [HttpDelete("{userid}/delete/{id}")]
         public async Task<DeleteResult> DeleteTweet(string userid, string id)

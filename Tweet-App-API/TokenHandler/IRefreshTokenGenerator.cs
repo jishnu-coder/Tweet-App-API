@@ -7,7 +7,7 @@ namespace Tweet_App_API.TokenHandler
 {
     public interface IRefreshTokenGenerator
     {
-        string GeneateToken();
+        public string GenerateRegreshToken();
 
     }
 }

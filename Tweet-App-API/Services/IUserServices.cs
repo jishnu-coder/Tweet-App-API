@@ -8,7 +8,7 @@ namespace Tweet_App_API.Services
 {
     public interface IUserServices
     {
-        public List<User> Get();
+        public Task<List<User>> Get();
 
         public List<User> GetUserById(string id);
 

@@ -30,7 +30,7 @@ namespace Tweet_App_API.Model
         [BsonElement("loginId")]
         public string LoginId { get; set; }
 
-        [JsonIgnore]
+       
         [BsonRequired]
         [BsonElement("password")]
         public string Password { get; set; }

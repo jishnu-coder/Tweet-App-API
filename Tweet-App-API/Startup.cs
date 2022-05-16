@@ -21,6 +21,7 @@ using Tweet_App_API.CustomAuthorization;
 using Tweet_App_API.DataBaseLayer;
 using Tweet_App_API.Model;
 using Tweet_App_API.Services;
+using Tweet_App_API.TokenHandler;
 
 namespace Tweet_App_API
 {
@@ -79,8 +80,10 @@ namespace Tweet_App_API
             services.AddSingleton<ITweetService, TweetService>();
             services.AddSingleton<IAuthorizationHandler, CanOnlyEditAndDeleteItsResource>();
 
-            services.AddControllers();
+            services.AddSingleton<IJwtAuthenticationManager, JwtAuthenticationManager>();
+            services.AddSingleton<IRefreshTokenGenerator, RefreshTokenGenerator>();
 
+            services.AddControllers();
           
         }
 

@@ -13,20 +13,20 @@ namespace Tweet_App_API.Services
     public class UserServices : IUserServices
     {
         private readonly IMongoCollection<User> _users;
-        private  GetAccessTokenClass accessClass;
+        private readonly IJwtAuthenticationManager jwtAuthenticationManager;
+
 
         //private readonly IMongoCollection<Test> _test;
-        public UserServices(IDBClient client)
+        public UserServices(IDBClient client , IJwtAuthenticationManager jwtAuthenticationManager)
         {
             _users = client.GetUserCollection();
-            accessClass = new GetAccessTokenClass();
+            this.jwtAuthenticationManager = jwtAuthenticationManager;
         }
 
-        public List<User> Get()
+        public async Task< List<User>> Get()
         {
-            List<User> users;
-            users = _users.Find(usr => true).ToList();
-            return users;
+            var users = await _users.FindAsync(usr => true);
+            return users?.ToList();
         }
 
         public List<User> GetUserById(string id) =>
@@ -41,7 +41,7 @@ namespace Tweet_App_API.Services
                 //Hash the password
                 usr.Password = CryptoGraphy.GetHash(usr.Password);
                 await _users.InsertOneAsync(usr);
-                var tokenContainer = await accessClass.GetAccessToken(usr.LoginId, usr.Email, usr.Password);
+                var tokenContainer =  jwtAuthenticationManager.Authenticate(usr.LoginId, usr.Email, usr.Password);
                 responsse.Token = tokenContainer.Token;
                 responsse.RefreshToken = tokenContainer.RefreshToken;
             }
@@ -64,7 +64,7 @@ namespace Tweet_App_API.Services
 
         public async Task<UserResponse> LoginUser(string loginId,string password)
         {
-            var user =_users.Find<User>(emp => emp.LoginId == loginId).FirstOrDefault();
+            var user = await _users.FindAsync<User>(emp => emp.LoginId == loginId).Result.FirstOrDefaultAsync();
 
             var userResponse = new UserResponse() { Errors = new List<string>() };
 
@@ -83,7 +83,7 @@ namespace Tweet_App_API.Services
 
             if(CryptoGraphy.CompareHash(newHashValue, user.Password))
             {
-               var tokenResponse = await accessClass.GetAccessToken(user.LoginId, user.Email, user.Password);
+                var tokenResponse = jwtAuthenticationManager.Authenticate(user.LoginId, user.Email, user.Password);
                 userResponse.Token = tokenResponse.Token;
                 userResponse.RefreshToken = tokenResponse.RefreshToken;
                 return userResponse;
