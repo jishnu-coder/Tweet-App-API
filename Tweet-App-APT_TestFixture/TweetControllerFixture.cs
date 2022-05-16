@@ -133,8 +133,8 @@ namespace Tweet_App_APT_TestFixture
             var userService = new UserServices(DbClient.Object,jwtmanager.Object);
             var tweetController = new TweetsController(_logger.Object, userService, _tweetService.Object);
 
-            //var response = tweetController.GetAll();
-            var response = userService.Get();
+            var response = tweetController.GetAll();
+            //var response = userService.Get();
 
             response.Result.Should().BeOfType(typeof(OkObjectResult));
         }

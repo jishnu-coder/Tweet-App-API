@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -79,9 +80,11 @@ namespace Tweet_App_API
             services.AddSingleton<IUserServices, UserServices>();
             services.AddSingleton<ITweetService, TweetService>();
             services.AddSingleton<IAuthorizationHandler, CanOnlyEditAndDeleteItsResource>();
-
+            
             services.AddSingleton<IJwtAuthenticationManager, JwtAuthenticationManager>();
             services.AddSingleton<IRefreshTokenGenerator, RefreshTokenGenerator>();
+
+            services.AddSingleton<IMongoClient, MongoClient>(sp => new MongoClient(Configuration["TweetAppDBSettings:ConnectionString"]));
 
             services.AddControllers();
           
