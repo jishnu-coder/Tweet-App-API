@@ -23,7 +23,7 @@ namespace Tweet_App_API.Services
             this.jwtAuthenticationManager = jwtAuthenticationManager;
         }
 
-        public async Task< List<User>> Get()
+        public async Task<List<User>> Get()
         {
             var users = await _users.FindAsync(usr => true);
             return users?.ToList();

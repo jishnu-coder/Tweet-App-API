@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,6 +10,7 @@ using MongoDB.Driver;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Security.Claims;
+using Microsoft.Extensions.Logging;
 
 namespace Tweet_App_API.Controllers
 {
@@ -44,6 +44,7 @@ namespace Tweet_App_API.Controllers
         [HttpGet("Login")]
         public async Task<IActionResult> Login(string loginId,string password)
         {
+         
             var result = await _userService.LoginUser(loginId, password);
             return Ok(result);
         }
@@ -52,7 +53,8 @@ namespace Tweet_App_API.Controllers
         public string ResetPassWord(string userId,string newPassword)
         {
             if( _userService.ResetPassword(userId, newPassword))
-            {
+            {              
+                _logger.LogInformation($"{userId} suucessfully update the password");
                 return "Password Successfully Changed";
             }
 
@@ -75,9 +77,9 @@ namespace Tweet_App_API.Controllers
        
         [Authorize(Policy = "whocanedit")]
         [HttpPost("{userid}/Add")]
-        public Tweet CreateTweet(Tweet tweet)
+        public async Task<Tweet> CreateTweet(Tweet tweet)
         {
-            return _tweetService.PostTweet(tweet);
+            return await _tweetService.PostTweet(tweet);
         }
 
         [HttpGet("all")]
@@ -87,9 +89,9 @@ namespace Tweet_App_API.Controllers
         }
 
         [HttpGet("{userid}")]
-        public List<Tweet> GetTweetById(string userid)
+        public async Task< List<Tweet>> GetTweetById(string userid)
         {
-            return _tweetService.GetByUserId(userid);
+            return await _tweetService.GetByUserId(userid);
         }
 
        

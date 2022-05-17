@@ -18,7 +18,7 @@ namespace Tweet_App_API.Services
             _tweet = client.GetTweetCollection();
         }
 
-        public Tweet PostTweet(Tweet tweet)
+        public async  Task<Tweet> PostTweet(Tweet tweet)
         {
             //Add Guid as tweet id
             tweet.TweetId = Guid.NewGuid().ToString();
@@ -28,8 +28,8 @@ namespace Tweet_App_API.Services
             tweet.Tags = tweet.Tags == null ? new List<string>() { } : tweet.Tags;
             tweet.Replys = tweet.Replys == null ? new List<TweetReply>() { } : tweet.Replys;
 
-            _tweet.InsertOne(tweet);
-            return tweet;
+            await _tweet.InsertOneAsync(tweet);
+            return await GetTweetByTweetId(tweet.TweetId);
         }
 
         public List<Tweet> GetAll()
@@ -37,9 +37,10 @@ namespace Tweet_App_API.Services
             return _tweet.AsQueryable().ToList();
         }
 
-        public List<Tweet> GetByUserId(string id)
+        public async Task<List<Tweet>> GetByUserId(string id)
         {
-            return _tweet.Find(x => x.CreatorId == id).ToList();
+            var result = await _tweet.FindAsync(x => x.CreatorId == id);
+            return result.ToList();
         }
 
         public async  Task<Tweet> UpdateTweet(string tweetid, Tweet tweet)
@@ -48,7 +49,9 @@ namespace Tweet_App_API.Services
             var filter = new BsonDocument("tweetId", tweet.TweetId);
             var update = Builders<Tweet>.Update.Set("content", tweet.Content).
                        Set("tags", tweet.Tags).Set("createTime", tweet.CreateTime);
-            return await _tweet.FindOneAndUpdateAsync<Tweet>(filter, update);
+             await _tweet.FindOneAndUpdateAsync<Tweet>(filter, update);
+
+            return await GetTweetByTweetId(tweet.TweetId);
         }
 
         public async Task<DeleteResult> DeleteTweet(string tweetid)
@@ -59,20 +62,24 @@ namespace Tweet_App_API.Services
            
         }
 
-        public Tweet GetTweetByTweetId(string id)
+        public async Task<Tweet> GetTweetByTweetId(string id)
         {
-            return _tweet.Find(x => x.TweetId == id).FirstOrDefault();
+            var result = await _tweet.FindAsync(x => x.TweetId == id);
+
+            return result.FirstOrDefault();
         }
 
         public async Task<Tweet> LikeTweet(string userId,string tweetId)
         {
-            var tweet = GetTweetByTweetId(tweetId);
+            var tweet = await GetTweetByTweetId(tweetId);
             if(!tweet.Likes.Contains(userId))
             {
                 var filter = new BsonDocument("tweetId", tweetId);
                 var update = Builders<Tweet>.Update.AddToSet("likes", userId);
 
-                return await _tweet.FindOneAndUpdateAsync<Tweet>(filter, update);
+                 await _tweet.FindOneAndUpdateAsync<Tweet>(filter, update);
+
+                return  await GetTweetByTweetId(tweetId);
             }
 
             return tweet;
@@ -85,7 +92,9 @@ namespace Tweet_App_API.Services
             var filter = new BsonDocument("tweetId", tweetId);
             var update = Builders<Tweet>.Update.AddToSet("replys", replyTweet);
 
-            return await _tweet.FindOneAndUpdateAsync<Tweet>(filter, update);
+             await _tweet.FindOneAndUpdateAsync<Tweet>(filter, update);
+
+            return await GetTweetByTweetId(tweetId);
         }
     }
 }

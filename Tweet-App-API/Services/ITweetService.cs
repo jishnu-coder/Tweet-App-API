@@ -9,11 +9,11 @@ namespace Tweet_App_API.Services
 {
     public interface ITweetService
     {
-        public Tweet PostTweet(Tweet tweet);
+        public Task<Tweet> PostTweet(Tweet tweet);
 
         public List<Tweet> GetAll();
 
-        public List<Tweet> GetByUserId(string id);
+        public Task<List<Tweet>> GetByUserId(string id);
 
         public Task<Tweet> UpdateTweet(string userid, Tweet tweet);
 
