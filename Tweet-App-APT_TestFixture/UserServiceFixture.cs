@@ -196,7 +196,115 @@ namespace Tweet_App_APT_TestFixture
 
             var result = userService.LoginUser("test1", "password");
 
-            //result[0].Email.Should().BeEquivalentTo("test1@gmail.com");
+            result.Result.Email.Should().BeEquivalentTo("test1@gmail.com");
+        }
+
+        [Test]
+        public void LoginUserWithIncorrectPasswordTest()
+        {
+
+            var userList = new List<User>();
+            userList.Add(new User()
+            {
+                FirstName = "Test1",
+                LastName = "User",
+                Email = "test1@gmail.com",
+                LoginId = "test1",
+                Password = "XohImNooBHFR0OVvjcYpJ3NgPQ1qq73WKhHvch0"
+
+            });
+
+            userList.Add(new User()
+            {
+                FirstName = "Test2",
+                LastName = "User",
+                Email = "test2@gmail.com",
+                LoginId = "test2"
+
+            });
+
+            Mock<IAsyncCursor<User>> _userCursor = new Mock<IAsyncCursor<User>>();
+
+            //mock movenext
+            _userCursor.Setup(_ => _.Current).Returns(userList);
+            _userCursor
+                .SetupSequence(_ => _.MoveNextAsync(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(true)
+                .ReturnsAsync(false);
+
+            _users.Setup(op => op.FindAsync<User>(It.IsAny<FilterDefinition<User>>(),
+                            It.IsAny<FindOptions<User, User>>(),
+                            It.IsAny<CancellationToken>())).ReturnsAsync(_userCursor.Object);
+
+            jwtAuthenticationManager.Setup(x => x.Authenticate(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+                  .Returns(new TokenResponse()
+                  {
+                      Token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6",
+                      RefreshToken = "rtyfwhikooloGTUIKK"
+                  });
+
+            var DbClient = new Mock<IDBClient>();
+            DbClient.Setup(x => x.GetUserCollection()).Returns(_users.Object);
+
+            var userService = new UserServices(DbClient.Object, jwtAuthenticationManager.Object);
+
+            var result = userService.LoginUser("test1", "password");
+
+            result.Result.Errors.Should().HaveCount(1);
+        }
+
+        [Test]
+        public void ResetPasswordTest()
+        {
+            var user = new User()
+            {
+                FirstName = "Test",
+                LastName = "User",
+                Email = "test@gmail.com",
+                LoginId = "test123",
+                Password = "XohImNooBHFR0OVvjcYpJ3NgPQ1qq73WKhHvch0VQtg="
+
+            };
+            var userList = new List<User>();
+            userList.Add(new User()
+            {
+                FirstName = "Test1",
+                LastName = "User",
+                Email = "test1@gmail.com",
+                LoginId = "test1"
+
+            });
+
+            userList.Add(new User()
+            {
+                FirstName = "Test2",
+                LastName = "User",
+                Email = "test2@gmail.com",
+                LoginId = "test2"
+
+            });
+
+            Mock<IAsyncCursor<User>> _userCursor = new Mock<IAsyncCursor<User>>();
+
+            //mock movenext
+            _userCursor.Setup(_ => _.Current).Returns(userList);
+            _userCursor
+                .SetupSequence(_ => _.MoveNext(It.IsAny<CancellationToken>()))
+                .Returns(true)
+                .Returns(false);
+
+            _users.Setup(op => op.FindSync(It.IsAny<FilterDefinition<User>>(),
+                            It.IsAny<FindOptions<User, User>>(),
+                            It.IsAny<CancellationToken>())).Returns(_userCursor.Object);
+
+            var DbClient = new Mock<IDBClient>();
+            DbClient.Setup(x => x.GetUserCollection()).Returns(_users.Object);
+
+            var userService = new UserServices(DbClient.Object, jwtAuthenticationManager.Object);
+
+            var result = userService.ResetPassword("test1","newPassword");
+
+            result.Should().Be(true);
         }
     }
 }
