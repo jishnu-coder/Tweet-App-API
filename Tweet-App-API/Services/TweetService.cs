@@ -12,16 +12,18 @@ namespace Tweet_App_API.Services
     public class TweetService : ITweetService
     {
         private readonly IMongoCollection<Tweet> _tweet;
+        private readonly IGuidService guidService;
 
-        public TweetService(IDBClient client)
+        public TweetService(IDBClient client , IGuidService guidService)
         {
             _tweet = client.GetTweetCollection();
+            this.guidService = guidService;
         }
 
         public async  Task<Tweet> PostTweet(Tweet tweet)
         {
             //Add Guid as tweet id
-            tweet.TweetId = Guid.NewGuid().ToString();
+            tweet.TweetId = guidService.NewGuid().ToString();
             tweet.CreateTime = DateTime.Now;
 
             tweet.Likes = tweet.Likes == null ? new List<string>() { } : tweet.Likes;
@@ -66,7 +68,7 @@ namespace Tweet_App_API.Services
         {
             var result = await _tweet.FindAsync(x => x.TweetId == id);
 
-            return result.FirstOrDefault();
+            return await result.FirstOrDefaultAsync();
         }
 
         public async Task<Tweet> LikeTweet(string userId,string tweetId)

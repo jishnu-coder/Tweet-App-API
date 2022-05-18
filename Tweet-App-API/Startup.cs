@@ -80,7 +80,7 @@ namespace Tweet_App_API
             services.AddSingleton<IUserServices, UserServices>();
             services.AddSingleton<ITweetService, TweetService>();
             services.AddSingleton<IAuthorizationHandler, CanOnlyEditAndDeleteItsResource>();
-            
+            services.AddSingleton<IGuidService, GuidService>();
             services.AddSingleton<IJwtAuthenticationManager, JwtAuthenticationManager>();
             services.AddSingleton<IRefreshTokenGenerator, RefreshTokenGenerator>();
 
