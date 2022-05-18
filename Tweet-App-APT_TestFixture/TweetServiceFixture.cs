@@ -200,5 +200,44 @@ namespace Tweet_App_APT_TestFixture
             response.Exception.Should().BeNull();
         }
 
+        [Test]
+        public void ReplyTweetTest()
+        {
+            var tweetList = new List<Tweet>() { };
+
+            tweetList.Add(new Tweet()
+            {
+                TweetId = new Guid("9D2B0228-4D0D-4C23-8B49-01A698857709").ToString(),
+                CreatorId = "jishnu123",
+                Content = "New Content",
+                Tags = new List<string>(),
+                Likes = new List<string>(),
+                Replys = new List<TweetReply>()
+            }); ;
+
+            Mock<IAsyncCursor<Tweet>> _tweetCursor = new Mock<IAsyncCursor<Tweet>>();
+
+            //mock movenext
+            _tweetCursor.Setup(_ => _.Current).Returns(tweetList);
+            _tweetCursor
+                .SetupSequence(_ => _.MoveNextAsync(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(true)
+                .ReturnsAsync(false);
+
+            _tweet.Setup(op => op.FindAsync<Tweet>(It.IsAny<FilterDefinition<Tweet>>(),
+                            It.IsAny<FindOptions<Tweet, Tweet>>(),
+                            It.IsAny<CancellationToken>())).ReturnsAsync(_tweetCursor.Object);
+
+            _guid.Setup(x => x.NewGuid()).Returns(new Guid("9D2B0228-4D0D-4C23-8B49-01A698857709"));
+
+            _Client.Setup(x => x.GetTweetCollection()).Returns(_tweet.Object);
+
+            var tweetService = new TweetService(_Client.Object, _guid.Object);
+
+            var response = tweetService.ReplyTweet("jishnu@gmail.com", "9D2B0228-4D0D-4C23-8B49-01A698857709", new TweetReply() {Replied_userId= "jishnu@gmail.com", ReplyMessage="Super..." });
+
+            response.Result.TweetId.Should().Be(new Guid("9D2B0228-4D0D-4C23-8B49-01A698857709").ToString());
+        }
+
     }
 }
