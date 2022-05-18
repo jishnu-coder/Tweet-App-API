@@ -10,7 +10,7 @@ namespace Tweet_App_API.Services
     {
         public Task<List<User>> Get();
 
-        public List<User> GetUserById(string id);
+        public Task<User> GetUserByEmail(string id);
 
         public Task<UserResponse> Register(User usr);
 

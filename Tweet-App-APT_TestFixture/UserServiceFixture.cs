@@ -28,7 +28,7 @@ namespace Tweet_App_APT_TestFixture
         }
 
         [Test]
-        public void GetUserByIdTest()
+        public void GetUserByEmailTest()
         {
             var user = new User()
             {
@@ -62,22 +62,22 @@ namespace Tweet_App_APT_TestFixture
             //mock movenext
             _userCursor.Setup(_ => _.Current).Returns(userList);
             _userCursor
-                .SetupSequence(_ => _.MoveNext(It.IsAny<CancellationToken>()))
-                .Returns(true)
-                .Returns(false);
+                .SetupSequence(_ => _.MoveNextAsync(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(true)
+                .ReturnsAsync(false);
 
-            _users.Setup(op => op.FindSync(It.IsAny<FilterDefinition<User>>(),
+            _users.Setup(op => op.FindAsync<User>(It.IsAny<FilterDefinition<User>>(),
                             It.IsAny<FindOptions<User, User>>(),
-                            It.IsAny<CancellationToken>())).Returns(_userCursor.Object);
+                            It.IsAny<CancellationToken>())).ReturnsAsync(_userCursor.Object);
 
             var DbClient = new Mock<IDBClient>();
             DbClient.Setup(x => x.GetUserCollection()).Returns(_users.Object);
 
             var userService = new UserServices(DbClient.Object, jwtAuthenticationManager.Object);
 
-            var result = userService.GetUserById("test1");
+            var result = userService.GetUserByEmail("test1");
 
-            result[0].Email.Should().BeEquivalentTo("test1@gmail.com");
+            result.Result.Email.Should().BeEquivalentTo("test1@gmail.com");
         }
 
         [Test]
@@ -94,7 +94,7 @@ namespace Tweet_App_APT_TestFixture
             };
             
 
-            jwtAuthenticationManager.Setup(x => x.Authenticate(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+            jwtAuthenticationManager.Setup(x => x.Authenticate(It.IsAny<string>(), It.IsAny<string>()))
                   .Returns(new TokenResponse()
                          {
                            Token= "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6",
@@ -128,7 +128,7 @@ namespace Tweet_App_APT_TestFixture
             _users.Setup(x => x.InsertOneAsync(It.IsAny<User>(), It.IsAny<InsertOneOptions>(), It.IsAny<CancellationToken>()))
                 .Throws( new Exception("customEmail exception"));
 
-            jwtAuthenticationManager.Setup(x => x.Authenticate(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+            jwtAuthenticationManager.Setup(x => x.Authenticate( It.IsAny<string>(), It.IsAny<string>()))
                   .Returns(new TokenResponse()
                   {
                       Token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6",
@@ -182,7 +182,7 @@ namespace Tweet_App_APT_TestFixture
                             It.IsAny<FindOptions<User, User>>(),
                             It.IsAny<CancellationToken>())).ReturnsAsync(_userCursor.Object);
 
-            jwtAuthenticationManager.Setup(x => x.Authenticate(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+            jwtAuthenticationManager.Setup(x => x.Authenticate( It.IsAny<string>(), It.IsAny<string>()))
                   .Returns(new TokenResponse()
                   {
                       Token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6",
@@ -236,7 +236,7 @@ namespace Tweet_App_APT_TestFixture
                             It.IsAny<FindOptions<User, User>>(),
                             It.IsAny<CancellationToken>())).ReturnsAsync(_userCursor.Object);
 
-            jwtAuthenticationManager.Setup(x => x.Authenticate(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+            jwtAuthenticationManager.Setup(x => x.Authenticate( It.IsAny<string>(), It.IsAny<string>()))
                   .Returns(new TokenResponse()
                   {
                       Token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6",

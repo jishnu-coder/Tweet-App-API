@@ -29,11 +29,17 @@ namespace Tweet_App_API.Services
             return users?.ToList();
         }
 
-        public List<User> GetUserById(string id) =>
-            _users.Find<User>(emp => emp.LoginId.Contains(id)).ToList();
+        public async Task<User> GetUserByEmail(string email)
+        {
+            var user = await _users.FindAsync<User>(emp => emp.Email.Equals(email));
+
+            return await user.FirstOrDefaultAsync();
+        }
+          
 
         public async Task<UserResponse> Register(User usr)
         {
+            usr.LoginId = usr.FirstName + Guid.NewGuid().ToString();
             var responsse = new UserResponse() {Email=usr.Email, LoginId = usr.LoginId , Errors=new List<string>() };
            
             try
@@ -41,7 +47,7 @@ namespace Tweet_App_API.Services
                 //Hash the password
                 usr.Password = CryptoGraphy.GetHash(usr.Password);
                 await _users.InsertOneAsync(usr);
-                var tokenContainer =  jwtAuthenticationManager.Authenticate(usr.LoginId, usr.Email, usr.Password);
+                var tokenContainer =  jwtAuthenticationManager.Authenticate(usr.Email, usr.Password);
                 responsse.Token = tokenContainer.Token;
                 responsse.RefreshToken = tokenContainer.RefreshToken;
             }
@@ -62,9 +68,9 @@ namespace Tweet_App_API.Services
             return responsse;
         }
 
-        public async Task<UserResponse> LoginUser(string loginId,string password)
+        public async Task<UserResponse> LoginUser(string email,string password)
         {
-            var user = await _users.FindAsync<User>(emp => emp.LoginId == loginId).Result.FirstOrDefaultAsync();
+            var user = await _users.FindAsync<User>(emp => emp.Email == email).Result.FirstOrDefaultAsync();
 
             var userResponse = new UserResponse() { Errors = new List<string>() };
 
@@ -83,7 +89,7 @@ namespace Tweet_App_API.Services
 
             if(CryptoGraphy.CompareHash(newHashValue, user.Password))
             {
-                var tokenResponse = jwtAuthenticationManager.Authenticate(user.LoginId, user.Email, user.Password);
+                var tokenResponse = jwtAuthenticationManager.Authenticate(user.Email, user.Password);
                 userResponse.Token = tokenResponse.Token;
                 userResponse.RefreshToken = tokenResponse.RefreshToken;
                 return userResponse;
@@ -93,13 +99,13 @@ namespace Tweet_App_API.Services
             return userResponse;
         }
 
-        public bool ResetPassword(string userId, string newPassword)
+        public bool ResetPassword(string email, string newPassword)
         {
-            var user = GetUserById(userId);
-            if (user[0] != null)
+            var user = GetUserByEmail(email);
+            if (user != null)
             {
                 var hashPassword = CryptoGraphy.GetHash(newPassword);
-                var filter = new BsonDocument("loginId", userId);
+                var filter = new BsonDocument("email", email);
                 var update = Builders<User>.Update.Set("password", hashPassword);
                 var result = _users.FindOneAndUpdate(filter, update);
                 return true;

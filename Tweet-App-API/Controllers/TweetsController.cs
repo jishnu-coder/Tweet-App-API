@@ -42,19 +42,19 @@ namespace Tweet_App_API.Controllers
 
         [AllowAnonymous]
         [HttpGet("Login")]
-        public async Task<IActionResult> Login(string loginId,string password)
+        public async Task<IActionResult> Login(string userName, string password)
         {
          
-            var result = await _userService.LoginUser(loginId, password);
+            var result = await _userService.LoginUser(userName, password);
             return Ok(result);
         }
 
-        [HttpGet("{userId}/forget-Password")]
-        public string ResetPassWord(string userId,string newPassword)
+        [HttpGet("{userName}/forget-Password")]
+        public string ResetPassWord(string userName,string newPassword)
         {
-            if( _userService.ResetPassword(userId, newPassword))
+            if( _userService.ResetPassword(userName, newPassword))
             {              
-                _logger.LogInformation($"{userId} suucessfully update the password");
+                _logger.LogInformation($"{userName} suucessfully update the password");
                 return "Password Successfully Changed";
             }
 
@@ -71,12 +71,12 @@ namespace Tweet_App_API.Controllers
         [HttpGet("search/{username}")]
         public IActionResult GetUserByName(string username)
         {            
-            return  Ok(_userService.GetUserById(username));
+            return  Ok(_userService.GetUserByEmail(username));
         }
 
        
         [Authorize(Policy = "whocanedit")]
-        [HttpPost("{userid}/Add")]
+        [HttpPost("{userName}/Add")]
         public async Task<Tweet> CreateTweet(Tweet tweet)
         {
             return await _tweetService.PostTweet(tweet);
@@ -88,16 +88,16 @@ namespace Tweet_App_API.Controllers
             return _tweetService.GetAll(); 
         }
 
-        [HttpGet("{userid}")]
-        public async Task< List<Tweet>> GetTweetById(string userid)
+        [HttpGet("{userName}")]
+        public async Task< List<Tweet>> GetTweetById(string userName)
         {
-            return await _tweetService.GetByUserId(userid);
+            return await _tweetService.GetByUserId(userName);
         }
 
        
         [Authorize(Policy = "whocanedit")]    
-        [HttpPut("{userid}/update/{id}")]
-        public async Task<IActionResult> UpdateTweet(string userid,string id , Tweet tweet)
+        [HttpPut("{userName}/update/{id}")]
+        public async Task<IActionResult> UpdateTweet(string userName, string id , Tweet tweet)
         {
             //string userId = User.Claims.First().Value;
             var result = await _tweetService.UpdateTweet(id, tweet);
@@ -106,22 +106,24 @@ namespace Tweet_App_API.Controllers
 
       
         [Authorize(Policy = "whocanedit")]
-        [HttpDelete("{userid}/delete/{id}")]
-        public async Task<DeleteResult> DeleteTweet(string userid, string id)
+        [HttpDelete("{userName}/delete/{id}")]
+        public async Task<DeleteResult> DeleteTweet(string userName, string id)
         {
             return await _tweetService.DeleteTweet(id);
         }
 
-        [HttpPut("{userid}/Like/{id}")]
-        public async Task<Tweet> LikeTweet(string userid, string id)
+        [Authorize(Policy = "whocanedit")]
+        [HttpPut("{userName}/Like/{id}")]
+        public async Task<Tweet> LikeTweet(string userName, string id)
         {
-            return await _tweetService.LikeTweet(userid,id);
+            return await _tweetService.LikeTweet(userName, id);
         }
 
+        [Authorize(Policy = "whocanedit")]
         [HttpPost("{userid}/reply/{id}")]
-        public async Task<Tweet> ReplyTweet(string userid, string id , TweetReply tweetReply)
+        public async Task<Tweet> ReplyTweet(string userName, string id , TweetReply tweetReply)
         {
-            return await _tweetService.ReplyTweet(userid, id ,tweetReply);
+            return await _tweetService.ReplyTweet(userName, id ,tweetReply);
         }
     }
 }

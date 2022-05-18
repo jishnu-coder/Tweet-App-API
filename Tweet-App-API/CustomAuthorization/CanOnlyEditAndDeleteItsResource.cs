@@ -20,9 +20,9 @@ namespace Tweet_App_API.CustomAuthorization
                 return Task.CompletedTask;
             }
 
-            var loggedUserId = context.User.Claims.First().Value;
-            var resourceOwnerId = authFilterContext.Request.RouteValues["userid"];
-            if (loggedUserId.Equals(resourceOwnerId))
+            var loggedUserName = context.User.Claims.First().Value;
+            var resourceOwnerUserName = authFilterContext.Request.RouteValues["userName"];
+            if (loggedUserName.Equals(resourceOwnerUserName))
             {
                 context.Succeed(requirement);
                 return Task.CompletedTask;

@@ -39,9 +39,9 @@ namespace Tweet_App_API.Services
             return _tweet.AsQueryable().ToList();
         }
 
-        public async Task<List<Tweet>> GetByUserId(string id)
+        public async Task<List<Tweet>> GetByUserId(string userName)
         {
-            var result = await _tweet.FindAsync(x => x.CreatorId == id);
+            var result = await _tweet.FindAsync(x => x.CreatorId == userName);
             return result.ToList();
         }
 

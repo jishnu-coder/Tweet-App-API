@@ -26,6 +26,7 @@ namespace Tweet_App_API.Model
         [BsonElement("email")]
         public string Email { get; set; }
 
+        [JsonIgnore]
         [BsonRequired]
         [BsonElement("loginId")]
         public string LoginId { get; set; }

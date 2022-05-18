@@ -24,7 +24,7 @@ namespace Tweet_App_API.TokenHandler
             _configuration = configuration;
         }
 
-        public TokenResponse Authenticate(string Username, string email, string password)
+        public TokenResponse Authenticate(string email, string password)
         {
             var tokenHandler = new JwtSecurityTokenHandler();// install System.IdentityModel.Tokens.Jwt
             var tokenKey = Encoding.ASCII.GetBytes(Key);
@@ -32,8 +32,7 @@ namespace Tweet_App_API.TokenHandler
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                       new Claim(ClaimTypes.Name, Username),
-                       new Claim(ClaimTypes.Email, email)
+                       new Claim(ClaimTypes.Name, email),                    
 
                 }
                 ),
@@ -41,8 +40,6 @@ namespace Tweet_App_API.TokenHandler
                 SigningCredentials = new SigningCredentials(
                     new SymmetricSecurityKey(tokenKey),
                     SecurityAlgorithms.HmacSha256Signature)
-
-
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
             var refreshToken = refreshTokenGenerator.GenerateRegreshToken();

@@ -8,6 +8,6 @@ namespace Tweet_App_API.TokenHandler
 {
     public interface IJwtAuthenticationManager
     {
-        TokenResponse Authenticate(string userid, string email, string password);
+        TokenResponse Authenticate(string email, string password);
     }
 }
