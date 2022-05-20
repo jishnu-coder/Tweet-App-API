@@ -16,8 +16,8 @@ namespace Tweet_App_API.TokenHandler
 
         public JwtAuthenticationManager(IRefreshTokenGenerator refreshTokenGenerator, IConfiguration configuration)
         {
-
-            Key = configuration["JWT:Key"];
+            _configuration = configuration;
+            Key = _configuration["JWT:Key"];
             this.refreshTokenGenerator = refreshTokenGenerator;
             _configuration = configuration;
         }

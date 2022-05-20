@@ -14,9 +14,7 @@ namespace Tweet_App_API.Services
     {
         private readonly IMongoCollection<User> _users;
         private readonly IJwtAuthenticationManager jwtAuthenticationManager;
-
-
-        //private readonly IMongoCollection<Test> _test;
+      
         public UserServices(IDBClient client, IJwtAuthenticationManager jwtAuthenticationManager)
         {
             _users = client.GetUserCollection();
@@ -107,7 +105,7 @@ namespace Tweet_App_API.Services
                 var hashPassword = CryptoGraphy.GetHash(newPassword);
                 var filter = new BsonDocument("email", email);
                 var update = Builders<User>.Update.Set("password", hashPassword);
-                var result = _users.FindOneAndUpdate(filter, update);
+                _users.FindOneAndUpdate(filter, update);
                 return true;
             }
 

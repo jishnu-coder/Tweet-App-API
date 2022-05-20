@@ -8,12 +8,12 @@ namespace Tweet_App_API.Services
     {
         public Task<List<User>> Get();
 
-        public Task<User> GetUserByEmail(string id);
+        public Task<User> GetUserByEmail(string email);
 
         public Task<UserResponse> Register(User usr);
 
-        public Task<UserResponse> LoginUser(string loginId, string password);
+        public Task<UserResponse> LoginUser(string email, string password);
 
-        public bool ResetPassword(string userId, string newPassword);
+        public bool ResetPassword(string email, string newPassword);
     }
 }

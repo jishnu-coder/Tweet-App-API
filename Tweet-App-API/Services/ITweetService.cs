@@ -11,16 +11,15 @@ namespace Tweet_App_API.Services
 
         public List<Tweet> GetAll();
 
-        public Task<List<Tweet>> GetByUserId(string id);
+        public Task<List<Tweet>> GetByUserId(string userName);
 
-        public Task<Tweet> UpdateTweet(string userid, Tweet tweet);
+        public Task<Tweet> UpdateTweet(string tweetid, Tweet tweet);
 
         public Task<DeleteResult> DeleteTweet(string tweetid);
 
         public Task<Tweet> LikeTweet(string userId, string tweetId);
 
         public Task<Tweet> ReplyTweet(string userId, string tweetId, TweetReply replyTweet);
-
-        //   public Tweet GetTweet();
+     
     }
 }

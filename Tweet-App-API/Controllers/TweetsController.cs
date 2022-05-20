@@ -17,9 +17,7 @@ namespace Tweet_App_API.Controllers
     {
         private readonly ILogger<TweetsController> _logger;
         private readonly IUserServices _userService;
-        private readonly ITweetService _tweetService;
-
-        public static List<User> userList = new List<User>();
+        private readonly ITweetService _tweetService;       
 
         public TweetsController(ILogger<TweetsController> logger, IUserServices userServices, ITweetService tweetService)
         {
@@ -94,8 +92,7 @@ namespace Tweet_App_API.Controllers
         [Authorize(Policy = "whocanedit")]
         [HttpPut("{userName}/update/{id}")]
         public async Task<IActionResult> UpdateTweet(string userName, string id, Tweet tweet)
-        {
-            //string userId = User.Claims.First().Value;
+        {           
             var result = await _tweetService.UpdateTweet(id, tweet);
             return Ok(result);
         }
