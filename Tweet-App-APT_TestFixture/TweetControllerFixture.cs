@@ -1,16 +1,15 @@
-using Moq;
-using NUnit.Framework;
-using Microsoft.Extensions.Logging;
-using Tweet_App_API.Controllers;
-using Tweet_App_API.Services;
-using Tweet_App_API.Model;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
-using Tweet_App_API.DataBaseLayer;
-using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
+using Moq;
+using NUnit.Framework;
+using System.Collections.Generic;
 using System.Threading;
+using Tweet_App_API.Controllers;
+using Tweet_App_API.DataBaseLayer;
+using Tweet_App_API.Model;
+using Tweet_App_API.Services;
 using Tweet_App_API.TokenHandler;
 
 namespace Tweet_App_APT_TestFixture
@@ -23,13 +22,13 @@ namespace Tweet_App_APT_TestFixture
         [SetUp]
         public void Setup()
         {
-             _logger = new Mock<ILogger<TweetsController>>();
-             _userService = new Mock<IUserServices>();
-             _tweetService = new Mock<ITweetService>();
+            _logger = new Mock<ILogger<TweetsController>>();
+            _userService = new Mock<IUserServices>();
+            _tweetService = new Mock<ITweetService>();
         }
 
         [Test]
-        public  void UserRegisterTest()
+        public void UserRegisterTest()
         {
             var userObj = new UserResponse()
             {
@@ -40,7 +39,7 @@ namespace Tweet_App_APT_TestFixture
             _userService.Setup(x => x.Register(It.IsAny<User>())).ReturnsAsync(userObj);
             var tweetController = new TweetsController(_logger.Object, _userService.Object, _tweetService.Object);
 
-            var response =  tweetController.Register(new User() { });
+            var response = tweetController.Register(new User() { });
 
             response.Result.Should().BeOfType(typeof(OkObjectResult));
         }
@@ -54,10 +53,10 @@ namespace Tweet_App_APT_TestFixture
                 LoginId = "Test123",
                 Token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IktpcmFuMTIzIiwiZW1haWwiuYmYiOjE2NTI2MjA5Mz"
             };
-            _userService.Setup(x => x.LoginUser(It.IsAny<string>(),It.IsAny<string>())).ReturnsAsync(userObj);
+            _userService.Setup(x => x.LoginUser(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(userObj);
             var tweetController = new TweetsController(_logger.Object, _userService.Object, _tweetService.Object);
 
-            var response = tweetController.Login("test123","password");
+            var response = tweetController.Login("test123", "password");
 
             response.Result.Should().BeOfType(typeof(OkObjectResult));
 
@@ -68,7 +67,7 @@ namespace Tweet_App_APT_TestFixture
         [Test]
         public void ResetPasswordTestSuccess()
         {
-           
+
             _userService.Setup(x => x.ResetPassword(It.IsAny<string>(), It.IsAny<string>())).Returns(true);
             var tweetController = new TweetsController(_logger.Object, _userService.Object, _tweetService.Object);
 
@@ -106,11 +105,11 @@ namespace Tweet_App_APT_TestFixture
                 {
                     FirstName="jishnu",
                     LoginId="jishnu123"
-                    
+
                 }
             };
 
-           
+
             Mock<IAsyncCursor<User>> _userCursor = new Mock<IAsyncCursor<User>>();
 
             //mock movenext
@@ -130,7 +129,7 @@ namespace Tweet_App_APT_TestFixture
             collectionMock.Object.InsertOneAsync(user);
             collectionMock.Object.InsertOneAsync(user);
             var jwtmanager = new Mock<IJwtAuthenticationManager>();
-            var userService = new UserServices(DbClient.Object,jwtmanager.Object);
+            var userService = new UserServices(DbClient.Object, jwtmanager.Object);
             var tweetController = new TweetsController(_logger.Object, userService, _tweetService.Object);
 
             var response = tweetController.GetAll();

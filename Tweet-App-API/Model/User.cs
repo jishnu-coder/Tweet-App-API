@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
-using MongoDB.Bson;
+﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using System.Text.Json.Serialization;
 namespace Tweet_App_API.Model
 {
     [BsonIgnoreExtraElements]
@@ -17,7 +13,7 @@ namespace Tweet_App_API.Model
         [BsonElement("firstName")]
         public string FirstName { get; set; }
 
-        
+
         [BsonRequired]
         [BsonElement("lastName")]
         public string LastName { get; set; }
@@ -31,7 +27,7 @@ namespace Tweet_App_API.Model
         [BsonElement("loginId")]
         public string LoginId { get; set; }
 
-       
+
         [BsonRequired]
         [BsonElement("password")]
         public string Password { get; set; }

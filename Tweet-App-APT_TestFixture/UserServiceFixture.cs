@@ -4,10 +4,7 @@ using Moq;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using Tweet_App_API.DataBaseLayer;
 using Tweet_App_API.Model;
 using Tweet_App_API.Services;
@@ -32,10 +29,10 @@ namespace Tweet_App_APT_TestFixture
         {
             var user = new User()
             {
-                FirstName="Test",
-                LastName="User",
-                Email="test@gmail.com",
-                LoginId="test123"
+                FirstName = "Test",
+                LastName = "User",
+                Email = "test@gmail.com",
+                LoginId = "test123"
 
             };
             var userList = new List<User>();
@@ -89,17 +86,17 @@ namespace Tweet_App_APT_TestFixture
                 LastName = "User",
                 Email = "test@gmail.com",
                 LoginId = "test123",
-                Password="password"
+                Password = "password"
 
             };
-            
+
 
             jwtAuthenticationManager.Setup(x => x.Authenticate(It.IsAny<string>(), It.IsAny<string>()))
                   .Returns(new TokenResponse()
-                         {
-                           Token= "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6",
-                            RefreshToken="rtyfwhikooloGTUIKK"
-                        });
+                  {
+                      Token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6",
+                      RefreshToken = "rtyfwhikooloGTUIKK"
+                  });
 
             var DbClient = new Mock<IDBClient>();
             DbClient.Setup(x => x.GetUserCollection()).Returns(_users.Object);
@@ -126,9 +123,9 @@ namespace Tweet_App_APT_TestFixture
 
 
             _users.Setup(x => x.InsertOneAsync(It.IsAny<User>(), It.IsAny<InsertOneOptions>(), It.IsAny<CancellationToken>()))
-                .Throws( new Exception("customEmail exception"));
+                .Throws(new Exception("customEmail exception"));
 
-            jwtAuthenticationManager.Setup(x => x.Authenticate( It.IsAny<string>(), It.IsAny<string>()))
+            jwtAuthenticationManager.Setup(x => x.Authenticate(It.IsAny<string>(), It.IsAny<string>()))
                   .Returns(new TokenResponse()
                   {
                       Token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6",
@@ -148,7 +145,7 @@ namespace Tweet_App_APT_TestFixture
         [Test]
         public void LoginUserTest()
         {
-           
+
             var userList = new List<User>();
             userList.Add(new User()
             {
@@ -182,7 +179,7 @@ namespace Tweet_App_APT_TestFixture
                             It.IsAny<FindOptions<User, User>>(),
                             It.IsAny<CancellationToken>())).ReturnsAsync(_userCursor.Object);
 
-            jwtAuthenticationManager.Setup(x => x.Authenticate( It.IsAny<string>(), It.IsAny<string>()))
+            jwtAuthenticationManager.Setup(x => x.Authenticate(It.IsAny<string>(), It.IsAny<string>()))
                   .Returns(new TokenResponse()
                   {
                       Token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6",
@@ -236,7 +233,7 @@ namespace Tweet_App_APT_TestFixture
                             It.IsAny<FindOptions<User, User>>(),
                             It.IsAny<CancellationToken>())).ReturnsAsync(_userCursor.Object);
 
-            jwtAuthenticationManager.Setup(x => x.Authenticate( It.IsAny<string>(), It.IsAny<string>()))
+            jwtAuthenticationManager.Setup(x => x.Authenticate(It.IsAny<string>(), It.IsAny<string>()))
                   .Returns(new TokenResponse()
                   {
                       Token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6",
@@ -302,7 +299,7 @@ namespace Tweet_App_APT_TestFixture
 
             var userService = new UserServices(DbClient.Object, jwtAuthenticationManager.Object);
 
-            var result = userService.ResetPassword("test1","newPassword");
+            var result = userService.ResetPassword("test1", "newPassword");
 
             result.Should().Be(true);
         }

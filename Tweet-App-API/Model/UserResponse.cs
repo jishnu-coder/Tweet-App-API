@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Tweet_App_API.Model
 {
@@ -15,6 +12,6 @@ namespace Tweet_App_API.Model
 
         public string RefreshToken { get; set; }
 
-        public List<string> Errors { get; set; }        
+        public List<string> Errors { get; set; }
     }
 }

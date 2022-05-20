@@ -1,12 +1,9 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 using Tweet_App_API.Model;
 
 namespace Tweet_App_API.TokenHandler
@@ -19,7 +16,7 @@ namespace Tweet_App_API.TokenHandler
 
         public JwtAuthenticationManager(IRefreshTokenGenerator refreshTokenGenerator, IConfiguration configuration)
         {
-         
+
             Key = configuration["JWT:Key"];
             this.refreshTokenGenerator = refreshTokenGenerator;
             _configuration = configuration;
@@ -33,7 +30,7 @@ namespace Tweet_App_API.TokenHandler
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                       new Claim(ClaimTypes.Name, email),                    
+                       new Claim(ClaimTypes.Name, email),
 
                 }
                 ),

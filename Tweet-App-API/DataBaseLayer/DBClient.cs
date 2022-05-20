@@ -1,9 +1,5 @@
-﻿using MongoDB.Bson;
-using MongoDB.Driver;
-using System;
-using System.Collections.Generic;
+﻿using MongoDB.Driver;
 using System.Linq;
-using System.Threading.Tasks;
 using Tweet_App_API.Model;
 
 namespace Tweet_App_API.DataBaseLayer
@@ -24,7 +20,7 @@ namespace Tweet_App_API.DataBaseLayer
 
             _tweets = GetDBCollection<Tweet>(database, settings.TweetCollectionName);
 
-           
+
 
             //_users.Indexes.CreateOne("{ title : 1 }", options);
 
@@ -40,7 +36,7 @@ namespace Tweet_App_API.DataBaseLayer
             return _tweets;
         }
 
-        public static IMongoCollection<T> GetDBCollection<T>(IMongoDatabase database,string collectionName)
+        public static IMongoCollection<T> GetDBCollection<T>(IMongoDatabase database, string collectionName)
         {
             var collectionList = database.ListCollectionNames()?.ToList();
 
@@ -54,6 +50,6 @@ namespace Tweet_App_API.DataBaseLayer
             return database.GetCollection<T>(collectionName);
         }
 
-      
+
     }
 }

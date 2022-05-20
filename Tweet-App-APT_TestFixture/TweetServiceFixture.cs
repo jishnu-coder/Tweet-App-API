@@ -5,10 +5,7 @@ using Moq;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
-using  System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using Tweet_App_API.DataBaseLayer;
 using Tweet_App_API.Model;
 using Tweet_App_API.Services;
@@ -22,7 +19,7 @@ namespace Tweet_App_APT_TestFixture
         Mock<IDBClient> _Client;
         Mock<IMongoQueryable<Tweet>> _mongoQueryableMock;
 
-        
+
 
         [SetUp]
         public void Setup()
@@ -41,13 +38,13 @@ namespace Tweet_App_APT_TestFixture
 
             tweetList.Add(new Tweet()
             {
-                TweetId= new Guid("9D2B0228-4D0D-4C23-8B49-01A698857709").ToString(),
-                CreatorId="jishnu123",
-                Content ="New Content",
-                Tags=new List<string>(),
-                Likes= new List<string>(),
+                TweetId = new Guid("9D2B0228-4D0D-4C23-8B49-01A698857709").ToString(),
+                CreatorId = "jishnu123",
+                Content = "New Content",
+                Tags = new List<string>(),
+                Likes = new List<string>(),
                 Replys = new List<TweetReply>()
-            });;
+            }); ;
 
             Mock<IAsyncCursor<Tweet>> _tweetCursor = new Mock<IAsyncCursor<Tweet>>();
 
@@ -68,7 +65,7 @@ namespace Tweet_App_APT_TestFixture
 
             var tweetService = new TweetService(_Client.Object, _guid.Object);
 
-            var response = tweetService.PostTweet(new Tweet() { Content = "New Content" ,  });
+            var response = tweetService.PostTweet(new Tweet() { Content = "New Content", });
 
             response.Result.TweetId.Should().Be(new Guid("9D2B0228-4D0D-4C23-8B49-01A698857709").ToString());
 
@@ -195,7 +192,7 @@ namespace Tweet_App_APT_TestFixture
 
             var tweetService = new TweetService(_Client.Object, _guid.Object);
 
-            var response = tweetService.LikeTweet( "jishnu@gmail.com", "9D2B0228-4D0D-4C23-8B49-01A698857709");
+            var response = tweetService.LikeTweet("jishnu@gmail.com", "9D2B0228-4D0D-4C23-8B49-01A698857709");
 
             response.Exception.Should().BeNull();
         }
@@ -234,7 +231,7 @@ namespace Tweet_App_APT_TestFixture
 
             var tweetService = new TweetService(_Client.Object, _guid.Object);
 
-            var response = tweetService.ReplyTweet("jishnu@gmail.com", "9D2B0228-4D0D-4C23-8B49-01A698857709", new TweetReply() {Replied_userId= "jishnu@gmail.com", ReplyMessage="Super..." });
+            var response = tweetService.ReplyTweet("jishnu@gmail.com", "9D2B0228-4D0D-4C23-8B49-01A698857709", new TweetReply() { Replied_userId = "jishnu@gmail.com", ReplyMessage = "Super..." });
 
             response.Result.TweetId.Should().Be(new Guid("9D2B0228-4D0D-4C23-8B49-01A698857709").ToString());
         }

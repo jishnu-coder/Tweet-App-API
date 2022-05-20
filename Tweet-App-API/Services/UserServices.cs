@@ -17,7 +17,7 @@ namespace Tweet_App_API.Services
 
 
         //private readonly IMongoCollection<Test> _test;
-        public UserServices(IDBClient client , IJwtAuthenticationManager jwtAuthenticationManager)
+        public UserServices(IDBClient client, IJwtAuthenticationManager jwtAuthenticationManager)
         {
             _users = client.GetUserCollection();
             this.jwtAuthenticationManager = jwtAuthenticationManager;
@@ -35,25 +35,25 @@ namespace Tweet_App_API.Services
 
             return await user.FirstOrDefaultAsync();
         }
-          
+
 
         public async Task<UserResponse> Register(User usr)
         {
             usr.LoginId = usr.FirstName + Guid.NewGuid().ToString();
-            var responsse = new UserResponse() {Email=usr.Email, LoginId = usr.LoginId , Errors=new List<string>() };
-           
+            var responsse = new UserResponse() { Email = usr.Email, LoginId = usr.LoginId, Errors = new List<string>() };
+
             try
             {
                 //Hash the password
                 usr.Password = CryptoGraphy.GetHash(usr.Password);
                 await _users.InsertOneAsync(usr);
-                var tokenContainer =  jwtAuthenticationManager.Authenticate(usr.Email, usr.Password);
+                var tokenContainer = jwtAuthenticationManager.Authenticate(usr.Email, usr.Password);
                 responsse.Token = tokenContainer.Token;
                 responsse.RefreshToken = tokenContainer.RefreshToken;
             }
             catch (Exception ex)
             {
-                if(ex.Message.Contains("customLoginId"))
+                if (ex.Message.Contains("customLoginId"))
                 {
                     responsse.Errors.Add("Login ID is already exisit");
                 }
@@ -68,7 +68,7 @@ namespace Tweet_App_API.Services
             return responsse;
         }
 
-        public async Task<UserResponse> LoginUser(string email,string password)
+        public async Task<UserResponse> LoginUser(string email, string password)
         {
             var user = await _users.FindAsync<User>(emp => emp.Email == email).Result.FirstOrDefaultAsync();
 
@@ -87,7 +87,7 @@ namespace Tweet_App_API.Services
 
             //Check the password match or Not
 
-            if(CryptoGraphy.CompareHash(newHashValue, user.Password))
+            if (CryptoGraphy.CompareHash(newHashValue, user.Password))
             {
                 var tokenResponse = jwtAuthenticationManager.Authenticate(user.Email, user.Password);
                 userResponse.Token = tokenResponse.Token;

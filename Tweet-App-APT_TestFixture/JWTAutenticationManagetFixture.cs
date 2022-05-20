@@ -2,11 +2,6 @@
 using Microsoft.Extensions.Configuration;
 using Moq;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Tweet_App_API.TokenHandler;
 
 namespace Tweet_App_APT_TestFixture
