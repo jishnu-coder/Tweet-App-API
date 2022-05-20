@@ -8,13 +8,12 @@ namespace Tweet_App_API.DataBaseLayer
     {
         private readonly IMongoCollection<User> _users;
         private readonly IMongoCollection<Tweet> _tweets;
-        private readonly IMongoClient _client;
+       
 
         public DBClient(ITweetAppDBSettings settings, IMongoClient client)
-        {
-            _client = client;
+        {          
 
-            var database = _client.GetDatabase(settings.DatabaseName);
+            var database = client.GetDatabase(settings.DatabaseName);
 
             _users = GetDBCollection<User>(database, settings.UserCollectionName);
 

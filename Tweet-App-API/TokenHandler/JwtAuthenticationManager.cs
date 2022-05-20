@@ -11,15 +11,15 @@ namespace Tweet_App_API.TokenHandler
     public class JwtAuthenticationManager : IJwtAuthenticationManager
     {
         private readonly string Key;
-        private readonly IConfiguration _configuration;
+      
         private readonly IRefreshTokenGenerator refreshTokenGenerator;
 
         public JwtAuthenticationManager(IRefreshTokenGenerator refreshTokenGenerator, IConfiguration configuration)
         {
-            _configuration = configuration;
-            Key = _configuration["JWT:Key"];
+          
+            Key = configuration["JWT:Key"];
             this.refreshTokenGenerator = refreshTokenGenerator;
-            _configuration = configuration;
+           
         }
 
         public TokenResponse Authenticate(string email, string password)
