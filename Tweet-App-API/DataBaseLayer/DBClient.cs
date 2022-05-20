@@ -45,6 +45,5 @@ namespace Tweet_App_API.DataBaseLayer
             return database.GetCollection<T>(collectionName);
         }
 
-
     }
 }

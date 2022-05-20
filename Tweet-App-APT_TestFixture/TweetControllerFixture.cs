@@ -137,5 +137,94 @@ namespace Tweet_App_APT_TestFixture
 
             response.Result.Should().BeOfType(typeof(OkObjectResult));
         }
+
+        [Test]
+        public void GeUserByNameTest()
+        {
+
+            _userService.Setup(x => x.GetUserByEmail(It.IsAny<string>())).ReturnsAsync(new User() { Email="test@123" });
+            var tweetController = new TweetsController(_logger.Object, _userService.Object, _tweetService.Object);
+
+            var response = tweetController.GetUserByName("test@123");
+
+            response.Should().BeOfType( typeof(OkObjectResult));
+        }
+
+        [Test]
+        public void CreateTweetTest()
+        {
+
+            _tweetService.Setup(x => x.PostTweet(It.IsAny<Tweet>())).ReturnsAsync(new Tweet() { TweetId="123456890"});
+            var tweetController = new TweetsController(_logger.Object, _userService.Object, _tweetService.Object);
+
+            var response = tweetController.CreateTweet(new Tweet() { TweetId = "123456" });
+            response.Result.TweetId.Should().Be("123456890");
+        }
+
+        [Test]
+        public void GetAllTweetTest()
+        {
+
+            _tweetService.Setup(x => x.GetAll()).Returns(new List<Tweet>() { new Tweet() { TweetId="1234567" } });
+            var tweetController = new TweetsController(_logger.Object, _userService.Object, _tweetService.Object);
+
+            var response = tweetController.GetAllTweet();
+            response.Should().HaveCount(1);
+        }
+
+        [Test]
+        public void GetTweetByIdTest()
+        {
+
+            _tweetService.Setup(x => x.GetByUserId(It.IsAny<string>())).ReturnsAsync(new List<Tweet>() { new Tweet() { TweetId = "1234567" } });
+            var tweetController = new TweetsController(_logger.Object, _userService.Object, _tweetService.Object);
+
+            var response = tweetController.GetTweetById("12345");
+            response.Result.Should().HaveCount(1);
+        }
+
+        [Test]
+        public void UpdateTweetTest()
+        {
+
+            _tweetService.Setup(x => x.UpdateTweet(It.IsAny<string>(), It.IsAny<Tweet>())).ReturnsAsync( new Tweet() { TweetId = "1234567" });
+            var tweetController = new TweetsController(_logger.Object, _userService.Object, _tweetService.Object);
+
+            var response = tweetController.UpdateTweet("test@gmail.com","12344",new Tweet() {TweetId="12345" });
+            response.Result.Should().BeOfType(typeof(OkObjectResult));
+        }
+
+        [Test]
+        public void DeleteTweetTest()
+        {
+            var deleteResult = new Mock<DeleteResult>();
+            _tweetService.Setup(x => x.DeleteTweet(It.IsAny<string>())).ReturnsAsync( deleteResult.Object);
+            var tweetController = new TweetsController(_logger.Object, _userService.Object, _tweetService.Object);
+
+            var response = tweetController.DeleteTweet("test", "12344");
+            response.Result.Should().Be(deleteResult.Object);
+        }
+
+        [Test]
+        public void LikeTweetTest()
+        {
+          
+            _tweetService.Setup(x => x.LikeTweet(It.IsAny<string>(),It.IsAny<string>())).ReturnsAsync(new Tweet() { TweetId="123456" });
+            var tweetController = new TweetsController(_logger.Object, _userService.Object, _tweetService.Object);
+
+            var response = tweetController.LikeTweet("test","123456");
+            response.Result.Should().BeOfType(typeof(Tweet));
+        }
+
+        [Test]
+        public void ReplyTweetTest()
+        {
+           
+            _tweetService.Setup(x => x.ReplyTweet(It.IsAny<string>(),It.IsAny<string>(),It.IsAny<TweetReply>())).ReturnsAsync(new Tweet() { TweetId="123456"});
+            var tweetController = new TweetsController(_logger.Object, _userService.Object, _tweetService.Object);
+
+            var response = tweetController.ReplyTweet("test", "12345", new TweetReply() { Replied_userId = "test1", ReplyMessage = "new Reply" });
+            response.Result.Should().BeOfType(typeof(Tweet));
+        }
     }
 }
