@@ -4,6 +4,8 @@ D:\FSE1\Tweet-App\Tweet-App-API\Tweet-App-API\CustomAuthorization\CanOnlyEditAnd
 D:\FSE1\Tweet-App\Tweet-App-API\Tweet-App-API\CustomAuthorization\ManageUserResourceEdit.cs
 D:\FSE1\Tweet-App\Tweet-App-API\Tweet-App-API\DataBaseLayer\DBClient.cs
 D:\FSE1\Tweet-App\Tweet-App-API\Tweet-App-API\DataBaseLayer\IDBClient.cs
+D:\FSE1\Tweet-App\Tweet-App-API\Tweet-App-API\Exceptions\InvalidTweetIdException.cs
+D:\FSE1\Tweet-App\Tweet-App-API\Tweet-App-API\Exceptions\InvalidUserNameException.cs
 D:\FSE1\Tweet-App\Tweet-App-API\Tweet-App-API\Model\TokenResponse.cs
 D:\FSE1\Tweet-App\Tweet-App-API\Tweet-App-API\Model\Tweet.cs
 D:\FSE1\Tweet-App\Tweet-App-API\Tweet-App-API\Model\TweetAppDBSettings.cs

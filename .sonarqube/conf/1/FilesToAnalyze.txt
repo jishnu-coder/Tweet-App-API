@@ -1,5 +1,4 @@
 ﻿D:\FSE1\Tweet-App\Tweet-App-API\Tweet-App-APT_TestFixture\AuthorizationHandlerFisture.cs
-D:\FSE1\Tweet-App\Tweet-App-API\Tweet-App-APT_TestFixture\CustomAutorizationFixture.cs
 D:\FSE1\Tweet-App\Tweet-App-API\Tweet-App-APT_TestFixture\DBClientFixture.cs
 D:\FSE1\Tweet-App\Tweet-App-API\Tweet-App-APT_TestFixture\JWTAutenticationManagetFixture.cs
 D:\FSE1\Tweet-App\Tweet-App-API\Tweet-App-APT_TestFixture\TweetControllerFixture.cs

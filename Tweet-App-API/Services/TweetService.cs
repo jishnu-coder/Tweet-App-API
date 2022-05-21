@@ -28,7 +28,7 @@ namespace Tweet_App_API.Services
             var isAValidCreator = await userServices.GetUserByEmail(tweet.CreatorId);
             if (isAValidCreator == null)
             {
-                throw new Exception("Not a Valid creator");
+                throw new InvalidUserNameException("Not a Valid creator");
             }
             //Add Guid as tweet id
             tweet.TweetId = guidService.NewGuid().ToString();
@@ -59,7 +59,7 @@ namespace Tweet_App_API.Services
             return result.ToList();
         }
 
-        public async Task<Tweet> UpdateTweet(string username, string tweetid, Tweet tweet)
+        public async Task<Tweet> UpdateTweet(string userName, string tweetid, Tweet tweet)
         {
             //Check if the userName and  tweet id are valid 
             if (await isValidUser(tweet.CreatorId) && await isValidTweet(tweetid))
