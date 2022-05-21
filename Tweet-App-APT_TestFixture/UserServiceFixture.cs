@@ -6,6 +6,7 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using Tweet_App_API.AutoMapper;
 using Tweet_App_API.DataBaseLayer;
 using Tweet_App_API.Model;
 using Tweet_App_API.Services;
@@ -17,15 +18,15 @@ namespace Tweet_App_APT_TestFixture
     {
         Mock<IMongoCollection<User>> _users;
         Mock<IJwtAuthenticationManager> jwtAuthenticationManager;
-        Mock<IMappingService> _mapper;
+        Mock<IMapper> _mapper;
 
         [SetUp]
         public void Setup()
         {
             _users = new Mock<IMongoCollection<User>>();
             jwtAuthenticationManager = new Mock<IJwtAuthenticationManager>();
-            _mapper = new Mock<IMappingService>();
-            _mapper.Setup(x => x.Map<User, UserViewModel>(It.IsAny<User>())).Returns(new UserViewModel() { Email = "test1@gmail.com" });
+           
+           // _mapper.Setup(x => x.Map<User, UserViewModel>(It.IsAny<User>())).Returns(new UserViewModel() { Email = "test1@gmail.com" });
         }
 
         [Test]
@@ -76,7 +77,9 @@ namespace Tweet_App_APT_TestFixture
 
             
             
-            var userService = new UserServices(DbClient.Object, jwtAuthenticationManager.Object,_mapper.Object);
+            var userService = new UserServices(DbClient.Object, jwtAuthenticationManager.Object,new Mapper(
+                 new MapperConfiguration(cfg => cfg.AddProfile(typeof(UserProfile))
+                )));
 
             var result = userService.GetUserByEmail("test1");
 
