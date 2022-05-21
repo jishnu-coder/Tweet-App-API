@@ -25,7 +25,7 @@ namespace Tweet_App_APT_TestFixture
         {
             _users = new Mock<IMongoCollection<User>>();
             jwtAuthenticationManager = new Mock<IJwtAuthenticationManager>();
-           
+            _mapper = new Mock<IMapper>();
            // _mapper.Setup(x => x.Map<User, UserViewModel>(It.IsAny<User>())).Returns(new UserViewModel() { Email = "test1@gmail.com" });
         }
 
