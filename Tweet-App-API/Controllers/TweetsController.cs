@@ -2,8 +2,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Primitives;
 using MongoDB.Driver;
+using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Tweet_App_API.Model;
 using Tweet_App_API.Services;
@@ -30,29 +33,42 @@ namespace Tweet_App_API.Controllers
         [HttpPost("Register")]
         public async Task<IActionResult> Register(User user)
         {
-            var result = await _userService.Register(user);
-            return Ok(result);
+            if( ModelState.IsValid )
+            {
+                var result = await _userService.Register(user);
+                return Ok(result);
+            }
+            return BadRequest();
         }
 
         [AllowAnonymous]
         [HttpGet("Login")]
-        public async Task<IActionResult> Login(string userName, string password)
+        public async Task<IActionResult> Login(UserLoginModel userLoginModel)
         {
+           if(ModelState.IsValid)
+            {
+                var result = await _userService.LoginUser(userLoginModel.UserName, userLoginModel.Password);
+                return Ok(result);
+            }
 
-            var result = await _userService.LoginUser(userName, password);
-            return Ok(result);
+            return BadRequest();            
         }
 
         [HttpGet("{userName}/forget-Password")]
-        public string ResetPassWord(string userName, string newPassword)
+        public IActionResult ResetPassWord(string userName,UserLoginModel userLoginModel)
         {
-            if (_userService.ResetPassword(userName, newPassword))
+            if (ModelState.IsValid)
             {
-                _logger.LogInformation($"{userName} suucessfully update the password");
-                return "Password Successfully Changed";
-            }
+                if (_userService.ResetPassword(userLoginModel.UserName, userLoginModel.Password))
+                {
+                    _logger.LogInformation($"{userLoginModel.UserName} suucessfully update the password");
+                    return Ok("Password Successfully Changed");
+                }
 
-            return "Login Id Incorrect";
+                return BadRequest("Login Id Incorrect");
+            }
+                
+            return BadRequest("Invalid Model");
         }
 
 
@@ -63,17 +79,32 @@ namespace Tweet_App_API.Controllers
         }
 
         [HttpGet("search/{username}")]
-        public IActionResult GetUserByName(string username)
+        public async  Task<IActionResult> GetUserByName(string username)
         {
-            return Ok(_userService.GetUserByEmail(username));
+          
+             var user = await _userService.GetUserByEmail(username);
+
+            return Ok(user);
         }
 
 
         [Authorize(Policy = "whocanedit")]
         [HttpPost("{userName}/Add")]
-        public async Task<Tweet> CreateTweet(Tweet tweet)
+        public async Task<IActionResult> CreateTweet(string userName,Tweet tweet)
         {
-            return await _tweetService.PostTweet(tweet);
+            if(ModelState.IsValid)
+            {
+                try
+                {
+                    var result = await _tweetService.PostTweet(tweet);
+                    return Ok("Tweet Posted Succesfully");
+                }
+                catch(Exception ex)
+                {
+                    return BadRequest(ex.ToString());
+                }
+            }
+            return BadRequest("Invalid Model");
         }
 
         [HttpGet("all")]
@@ -83,18 +114,33 @@ namespace Tweet_App_API.Controllers
         }
 
         [HttpGet("{userName}")]
-        public async Task<List<Tweet>> GetTweetById(string userName)
+        public async Task<IActionResult> GetTweetById(string userName)
         {
-            return await _tweetService.GetByUserId(userName);
+            try
+            {
+                var result = await _tweetService.GetTweetsByUserId(userName);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.ToString());
+            }
         }
 
 
         [Authorize(Policy = "whocanedit")]
         [HttpPut("{userName}/update/{id}")]
         public async Task<IActionResult> UpdateTweet(string userName, string id, Tweet tweet)
-        {           
-            var result = await _tweetService.UpdateTweet(id, tweet);
-            return Ok(result);
+        {
+            try
+            {
+                var result = await _tweetService.UpdateTweet(userName, id, tweet);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.ToString());
+            }
         }
 
 
@@ -113,10 +159,18 @@ namespace Tweet_App_API.Controllers
         }
 
         [Authorize(Policy = "whocanedit")]
-        [HttpPost("{userid}/reply/{id}")]
-        public async Task<Tweet> ReplyTweet(string userName, string id, TweetReply tweetReply)
+        [HttpPost("{userName}/reply/{id}")]
+        public async Task<IActionResult> ReplyTweet(string userName, string id, TweetReply tweetReply)
         {
-            return await _tweetService.ReplyTweet(userName, id, tweetReply);
+            try
+            {
+                var result = await _tweetService.ReplyTweet(userName, id, tweetReply);
+                return Ok(result);
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex.ToString());
+            }
         }
     }
 }

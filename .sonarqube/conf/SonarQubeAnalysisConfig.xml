@@ -114,6 +114,8 @@
   </ServerSettings>
   <LocalSettings>
     <Property Name="sonar.host.url">http://localhost:9000</Property>
+    <Property Name="sonar.cs.opencover.reportsPaths">Tweet-App-APT_TestFixture\coverage.opencover.xml</Property>
+    <Property Name="sonar.coverage.exclusions">**Tests*.cs</Property>
   </LocalSettings>
   <AnalyzersSettings>
     <AnalyzerSettings>

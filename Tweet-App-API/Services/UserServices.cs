@@ -1,4 +1,5 @@
-﻿using MongoDB.Bson;
+﻿using AutoMapper;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
@@ -14,24 +15,34 @@ namespace Tweet_App_API.Services
     {
         private readonly IMongoCollection<User> _users;
         private readonly IJwtAuthenticationManager jwtAuthenticationManager;
-      
-        public UserServices(IDBClient client, IJwtAuthenticationManager jwtAuthenticationManager)
+        private readonly IMapper _mapper;
+
+        public UserServices(IDBClient client, IJwtAuthenticationManager jwtAuthenticationManager , IMapper mapper)
         {
             _users = client.GetUserCollection();
             this.jwtAuthenticationManager = jwtAuthenticationManager;
+            _mapper = mapper;
         }
 
-        public async Task<List<User>> Get()
+        public async Task<List<UserViewModel>> Get()
         {
             var users = await _users.FindAsync(usr => true);
-            return users?.ToList();
+            var result = users?.ToList();
+
+            var userViewModel = _mapper.Map<List<UserViewModel>>(result);
+
+            return userViewModel;
         }
 
-        public async Task<User> GetUserByEmail(string email)
+        public async Task<UserViewModel> GetUserByEmail(string email)
         {
             var user = await _users.FindAsync<User>(emp => emp.Email.Equals(email));
 
-            return await user.FirstOrDefaultAsync();
+            var result = await user.FirstOrDefaultAsync();
+
+            UserViewModel userViewModel = _mapper.Map<UserViewModel>(result);
+
+            return userViewModel;
         }
 
 
@@ -59,6 +70,7 @@ namespace Tweet_App_API.Services
                 if (ex.Message.Contains("customEmail"))
                 {
                     responsse.Errors.Add("Email is already exisit");
+                    responsse.LoginId = null;
                 }
 
             }

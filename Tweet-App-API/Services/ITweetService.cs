@@ -11,9 +11,9 @@ namespace Tweet_App_API.Services
 
         public List<Tweet> GetAll();
 
-        public Task<List<Tweet>> GetByUserId(string userName);
+        public Task<List<Tweet>> GetTweetsByUserId(string userName);
 
-        public Task<Tweet> UpdateTweet(string tweetid, Tweet tweet);
+        public Task<Tweet> UpdateTweet(string userName,string tweetid, Tweet tweet);
 
         public Task<DeleteResult> DeleteTweet(string tweetid);
 

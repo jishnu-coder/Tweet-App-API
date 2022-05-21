@@ -68,7 +68,7 @@ namespace Tweet_App_API
             services.AddSingleton<ITweetAppDBSettings>(sp =>
                 sp.GetRequiredService<IOptions<TweetAppDBSettings>>().Value);
 
-
+            services.AddAutoMapper(typeof(Startup));
             services.AddSingleton<IDBClient, DBClient>();
             services.AddSingleton<IUserServices, UserServices>();
             services.AddSingleton<ITweetService, TweetService>();

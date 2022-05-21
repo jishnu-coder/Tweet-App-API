@@ -2,11 +2,14 @@
 using MongoDB.Bson.Serialization.Attributes;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace Tweet_App_API.Model
 {
     public class Tweet
     {
+        [JsonIgnore]
         [BsonId]
         public ObjectId id { get; set; }
 
@@ -14,10 +17,12 @@ namespace Tweet_App_API.Model
         [BsonElement("tweetId")]
         public string TweetId { get; set; }
 
+        [Required]
         [BsonRequired]
         [BsonElement("creatorId")]
         public string CreatorId { get; set; }
 
+        [Required]
         [BsonRequired]
         [BsonElement("content")]
         public string Content { get; set; }

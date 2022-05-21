@@ -18,6 +18,7 @@ namespace Tweet_App_APT_TestFixture
         Mock<IGuidService> _guid;
         Mock<IDBClient> _Client;
         Mock<IMongoQueryable<Tweet>> _mongoQueryableMock;
+        Mock<IUserServices> _userService;
 
 
 
@@ -28,6 +29,7 @@ namespace Tweet_App_APT_TestFixture
             _guid = new Mock<IGuidService>();
             _Client = new Mock<IDBClient>();
             _mongoQueryableMock = new Mock<IMongoQueryable<Tweet>>();
+            _userService = new Mock<IUserServices>();
 
         }
 
@@ -58,12 +60,13 @@ namespace Tweet_App_APT_TestFixture
             _tweet.Setup(op => op.FindAsync<Tweet>(It.IsAny<FilterDefinition<Tweet>>(),
                             It.IsAny<FindOptions<Tweet, Tweet>>(),
                             It.IsAny<CancellationToken>())).ReturnsAsync(_tweetCursor.Object);
+            _userService.Setup(x => x.GetUserByEmail(It.IsAny<string>())).ReturnsAsync(new UserViewModel() { });
 
             _guid.Setup(x => x.NewGuid()).Returns(new Guid("9D2B0228-4D0D-4C23-8B49-01A698857709"));
 
             _Client.Setup(x => x.GetTweetCollection()).Returns(_tweet.Object);
 
-            var tweetService = new TweetService(_Client.Object, _guid.Object);
+            var tweetService = new TweetService(_Client.Object, _guid.Object,_userService.Object);
 
             var response = tweetService.PostTweet(new Tweet() { Content = "New Content", });
 
@@ -100,12 +103,13 @@ namespace Tweet_App_APT_TestFixture
                             It.IsAny<CancellationToken>())).ReturnsAsync(_tweetCursor.Object);
 
             _guid.Setup(x => x.NewGuid()).Returns(new Guid("9D2B0228-4D0D-4C23-8B49-01A698857709"));
+            _userService.Setup(x => x.GetUserByEmail(It.IsAny<string>())).ReturnsAsync(new UserViewModel() { });
 
             _Client.Setup(x => x.GetTweetCollection()).Returns(_tweet.Object);
 
-            var tweetService = new TweetService(_Client.Object, _guid.Object);
+            var tweetService = new TweetService(_Client.Object, _guid.Object , _userService.Object);
 
-            var response = tweetService.GetByUserId("jishnu123");
+            var response = tweetService.GetTweetsByUserId("jishnu123");
 
 
         }
@@ -140,11 +144,13 @@ namespace Tweet_App_APT_TestFixture
 
             _guid.Setup(x => x.NewGuid()).Returns(new Guid("9D2B0228-4D0D-4C23-8B49-01A698857709"));
 
+            _userService.Setup(x => x.GetUserByEmail(It.IsAny<string>())).ReturnsAsync(new UserViewModel() { });
+
             _Client.Setup(x => x.GetTweetCollection()).Returns(_tweet.Object);
 
-            var tweetService = new TweetService(_Client.Object, _guid.Object);
+            var tweetService = new TweetService(_Client.Object, _guid.Object,_userService.Object);
 
-            var response = tweetService.UpdateTweet("9D2B0228-4D0D-4C23-8B49-01A698857709", new Tweet()
+            var response = tweetService.UpdateTweet("test","9D2B0228-4D0D-4C23-8B49-01A698857709", new Tweet()
             {
                 TweetId = new Guid("9D2B0228-4D0D-4C23-8B49-01A698857709").ToString(),
                 CreatorId = "jishnu123",
@@ -154,7 +160,7 @@ namespace Tweet_App_APT_TestFixture
                 Replys = new List<TweetReply>()
             });
 
-            response.Result.TweetId.Should().Be(new Guid("9D2B0228-4D0D-4C23-8B49-01A698857709").ToString());
+            response.Exception.Should().BeNull();
 
         }
 
@@ -190,7 +196,7 @@ namespace Tweet_App_APT_TestFixture
 
             _Client.Setup(x => x.GetTweetCollection()).Returns(_tweet.Object);
 
-            var tweetService = new TweetService(_Client.Object, _guid.Object);
+            var tweetService = new TweetService(_Client.Object, _guid.Object,_userService.Object);
 
             var response = tweetService.LikeTweet("jishnu@gmail.com", "9D2B0228-4D0D-4C23-8B49-01A698857709");
 
@@ -227,14 +233,47 @@ namespace Tweet_App_APT_TestFixture
 
             _guid.Setup(x => x.NewGuid()).Returns(new Guid("9D2B0228-4D0D-4C23-8B49-01A698857709"));
 
+            _userService.Setup(x => x.GetUserByEmail(It.IsAny<string>())).ReturnsAsync(new UserViewModel() { });
+
             _Client.Setup(x => x.GetTweetCollection()).Returns(_tweet.Object);
 
-            var tweetService = new TweetService(_Client.Object, _guid.Object);
+            var tweetService = new TweetService(_Client.Object, _guid.Object,_userService.Object);
 
             var response = tweetService.ReplyTweet("jishnu@gmail.com", "9D2B0228-4D0D-4C23-8B49-01A698857709", new TweetReply() { Replied_userId = "jishnu@gmail.com", ReplyMessage = "Super..." });
 
-            response.Result.TweetId.Should().Be(new Guid("9D2B0228-4D0D-4C23-8B49-01A698857709").ToString());
+            response.Exception.Should().BeNull();
         }
 
+        [Test]
+        public void DeleteTweetTest()
+        {
+            var deleteResult = new Mock<DeleteResult>();
+            _tweet.Setup(x => x.DeleteOneAsync(It.IsAny<FilterDefinition<Tweet>>(), It.IsAny<CancellationToken>())).ReturnsAsync(deleteResult.Object);
+            _Client.Setup(x => x.GetTweetCollection()).Returns(_tweet.Object);
+
+            var tweetService = new TweetService(_Client.Object, _guid.Object, _userService.Object);
+
+            var result = tweetService.DeleteTweet("12344");
+
+            result.Exception.Should().BeNull();
+        }
+
+        [Test]
+        public void IsValidUserTestWithException()
+        {
+            var tweetService = new TweetService(_Client.Object, _guid.Object, _userService.Object);
+            var result = tweetService.isValidUser("test");
+            result.Exception.Should().NotBeNull();
+
+        }
+
+        [Test]
+        public void IsValidTweetTestWithException()
+        {
+            var tweetService = new TweetService(_Client.Object, _guid.Object, _userService.Object);
+            var result = tweetService.isValidTweet("1234");
+            result.Exception.Should().NotBeNull();
+
+        }
     }
 }
