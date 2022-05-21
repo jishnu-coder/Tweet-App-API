@@ -7,6 +7,7 @@ namespace Tweet_App_API.TokenHandler
     {
         public string GenerateRegreshToken()
         {
+            //Use any random number to create the token
             var randomNumber = new byte[32];
             using (var randonmNUmberGeneratir = RandomNumberGenerator.Create())
             {

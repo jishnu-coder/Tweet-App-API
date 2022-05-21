@@ -1,4 +1,5 @@
-﻿D:\FSE1\Tweet-App\Tweet-App-API\Tweet-App-API\Controllers\TweetsController.cs
+﻿D:\FSE1\Tweet-App\Tweet-App-API\Tweet-App-API\AutoMapper\UserProfile.cs
+D:\FSE1\Tweet-App\Tweet-App-API\Tweet-App-API\Controllers\TweetsController.cs
 D:\FSE1\Tweet-App\Tweet-App-API\Tweet-App-API\CustomAuthorization\CanOnlyEditAndDeleteItsResource.cs
 D:\FSE1\Tweet-App\Tweet-App-API\Tweet-App-API\CustomAuthorization\ManageUserResourceEdit.cs
 D:\FSE1\Tweet-App\Tweet-App-API\Tweet-App-API\DataBaseLayer\DBClient.cs
@@ -7,7 +8,9 @@ D:\FSE1\Tweet-App\Tweet-App-API\Tweet-App-API\Model\TokenResponse.cs
 D:\FSE1\Tweet-App\Tweet-App-API\Tweet-App-API\Model\Tweet.cs
 D:\FSE1\Tweet-App\Tweet-App-API\Tweet-App-API\Model\TweetAppDBSettings.cs
 D:\FSE1\Tweet-App\Tweet-App-API\Tweet-App-API\Model\User.cs
+D:\FSE1\Tweet-App\Tweet-App-API\Tweet-App-API\Model\UserLoginModel.cs
 D:\FSE1\Tweet-App\Tweet-App-API\Tweet-App-API\Model\UserResponse.cs
+D:\FSE1\Tweet-App\Tweet-App-API\Tweet-App-API\Model\UserViewModel.cs
 D:\FSE1\Tweet-App\Tweet-App-API\Tweet-App-API\Program.cs
 D:\FSE1\Tweet-App\Tweet-App-API\Tweet-App-API\Services\CryptoGraphy.cs
 D:\FSE1\Tweet-App\Tweet-App-API\Tweet-App-API\Services\IGuidService.cs

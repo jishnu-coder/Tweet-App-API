@@ -50,7 +50,7 @@ namespace Tweet_App_APT_TestFixture
         [Test]
         public void UserRegisterTest_ModelState_NotValid()
         {
-           
+
             var tweetController = new TweetsController(_logger.Object, _userService.Object, _tweetService.Object);
 
             tweetController.ModelState.AddModelError("test", "test");
@@ -72,7 +72,7 @@ namespace Tweet_App_APT_TestFixture
             _userService.Setup(x => x.LoginUser(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(userObj);
             var tweetController = new TweetsController(_logger.Object, _userService.Object, _tweetService.Object);
 
-            var response = tweetController.Login(new UserLoginModel() { UserName="test@gmail.com",Password="password" });
+            var response = tweetController.Login(new UserLoginModel() { UserName = "test@gmail.com", Password = "password" });
 
             response.Result.Should().BeOfType(typeof(OkObjectResult));
 
@@ -83,15 +83,15 @@ namespace Tweet_App_APT_TestFixture
         [Test]
         public void UserLoginTest_NullInput()
         {
-           
+
             var tweetController = new TweetsController(_logger.Object, _userService.Object, _tweetService.Object);
 
             tweetController.ModelState.AddModelError("test", "test");
 
-            var response = tweetController.Login(new UserLoginModel() { UserName = "test@gmail.com"});
+            var response = tweetController.Login(new UserLoginModel() { UserName = "test@gmail.com" });
 
             response.Result.Should().BeOfType(typeof(BadRequestResult));
-           
+
         }
 
         [Test]
@@ -101,7 +101,7 @@ namespace Tweet_App_APT_TestFixture
             _userService.Setup(x => x.ResetPassword(It.IsAny<string>(), It.IsAny<string>())).Returns(true);
             var tweetController = new TweetsController(_logger.Object, _userService.Object, _tweetService.Object);
 
-            var response = tweetController.ResetPassWord("test1230",new UserLoginModel() { UserName = "test123", Password = "password" });
+            var response = tweetController.ResetPassWord("test1230", new UserLoginModel() { UserName = "test123", Password = "password" });
 
             response.Should().BeOfType(typeof(OkObjectResult));
         }
@@ -113,7 +113,7 @@ namespace Tweet_App_APT_TestFixture
             _userService.Setup(x => x.ResetPassword(It.IsAny<string>(), It.IsAny<string>())).Returns(false);
             var tweetController = new TweetsController(_logger.Object, _userService.Object, _tweetService.Object);
 
-           var response = tweetController.ResetPassWord("test@123",new UserLoginModel() { UserName = "test123", Password = "password" });
+            var response = tweetController.ResetPassWord("test@123", new UserLoginModel() { UserName = "test123", Password = "password" });
 
 
             response.Should().BeOfType(typeof(BadRequestObjectResult));
@@ -128,7 +128,7 @@ namespace Tweet_App_APT_TestFixture
 
             tweetController.ModelState.AddModelError("test", "test");
 
-            var response = tweetController.ResetPassWord("test@123",new UserLoginModel() { UserName = "test123", Password = "password" });
+            var response = tweetController.ResetPassWord("test@123", new UserLoginModel() { UserName = "test123", Password = "password" });
 
             response.Should().BeOfType(typeof(BadRequestObjectResult));
         }
@@ -174,10 +174,10 @@ namespace Tweet_App_APT_TestFixture
             collectionMock.Object.InsertOneAsync(user);
             collectionMock.Object.InsertOneAsync(user);
             var jwtmanager = new Mock<IJwtAuthenticationManager>();
-            var userService = new UserServices(DbClient.Object, jwtmanager.Object,_mapper.Object);
+            var userService = new UserServices(DbClient.Object, jwtmanager.Object, _mapper.Object);
             var tweetController = new TweetsController(_logger.Object, userService, _tweetService.Object);
 
-            var response = tweetController.GetAll();
+            var response = tweetController.GetAllUsers();
             //var response = userService.Get();
 
             response.Result.Should().BeOfType(typeof(OkObjectResult));
@@ -187,22 +187,22 @@ namespace Tweet_App_APT_TestFixture
         public void GeUserByNameTest()
         {
 
-            _userService.Setup(x => x.GetUserByEmail(It.IsAny<string>())).ReturnsAsync(new UserViewModel() { Email="test@123" });
+            _userService.Setup(x => x.GetUserByEmail(It.IsAny<string>())).ReturnsAsync(new UserViewModel() { Email = "test@123" });
             var tweetController = new TweetsController(_logger.Object, _userService.Object, _tweetService.Object);
 
             var response = tweetController.GetUserByName("test@123");
 
-            response.Result.Should().BeOfType( typeof(OkObjectResult));
+            response.Result.Should().BeOfType(typeof(OkObjectResult));
         }
 
         [Test]
         public void CreateTweetTest()
         {
 
-            _tweetService.Setup(x => x.PostTweet(It.IsAny<Tweet>())).ReturnsAsync(new Tweet() { TweetId="123456890"});
+            _tweetService.Setup(x => x.PostTweet(It.IsAny<Tweet>())).ReturnsAsync(new Tweet() { TweetId = "123456890" });
             var tweetController = new TweetsController(_logger.Object, _userService.Object, _tweetService.Object);
 
-            var response = tweetController.CreateTweet("test",new Tweet() { TweetId = "123456" });
+            var response = tweetController.CreateTweet("test", new Tweet() { TweetId = "123456" });
             response.Result.Should().BeOfType(typeof(OkObjectResult));
         }
 
@@ -215,7 +215,7 @@ namespace Tweet_App_APT_TestFixture
 
             tweetController.ModelState.AddModelError("test", "test");
 
-            var response = tweetController.CreateTweet("test@123",new Tweet() { TweetId = "123456" });
+            var response = tweetController.CreateTweet("test@123", new Tweet() { TweetId = "123456" });
             response.Result.Should().BeOfType(typeof(BadRequestObjectResult));
         }
 
@@ -223,7 +223,7 @@ namespace Tweet_App_APT_TestFixture
         public void GetAllTweetTest()
         {
 
-            _tweetService.Setup(x => x.GetAll()).Returns(new List<Tweet>() { new Tweet() { TweetId="1234567" } });
+            _tweetService.Setup(x => x.GetAll()).Returns(new List<Tweet>() { new Tweet() { TweetId = "1234567" } });
             var tweetController = new TweetsController(_logger.Object, _userService.Object, _tweetService.Object);
 
             var response = tweetController.GetAllTweet();
@@ -245,10 +245,10 @@ namespace Tweet_App_APT_TestFixture
         public void UpdateTweetTest()
         {
 
-            _tweetService.Setup(x => x.UpdateTweet(It.IsAny<string>(),It.IsAny<string>(), It.IsAny<Tweet>())).ReturnsAsync( new Tweet() { TweetId = "1234567" });
+            _tweetService.Setup(x => x.UpdateTweet(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Tweet>())).ReturnsAsync(new Tweet() { TweetId = "1234567" });
             var tweetController = new TweetsController(_logger.Object, _userService.Object, _tweetService.Object);
 
-            var response = tweetController.UpdateTweet("test@gmail.com","12344",new Tweet() {TweetId="12345" });
+            var response = tweetController.UpdateTweet("test@gmail.com", "12344", new Tweet() { TweetId = "12345" });
             response.Result.Should().BeOfType(typeof(OkObjectResult));
         }
 
@@ -256,7 +256,7 @@ namespace Tweet_App_APT_TestFixture
         public void DeleteTweetTest()
         {
             var deleteResult = new Mock<DeleteResult>();
-            _tweetService.Setup(x => x.DeleteTweet(It.IsAny<string>())).ReturnsAsync( deleteResult.Object);
+            _tweetService.Setup(x => x.DeleteTweet(It.IsAny<string>())).ReturnsAsync(deleteResult.Object);
             var tweetController = new TweetsController(_logger.Object, _userService.Object, _tweetService.Object);
 
             var response = tweetController.DeleteTweet("test", "12344");
@@ -266,19 +266,19 @@ namespace Tweet_App_APT_TestFixture
         [Test]
         public void LikeTweetTest()
         {
-          
-            _tweetService.Setup(x => x.LikeTweet(It.IsAny<string>(),It.IsAny<string>())).ReturnsAsync(new Tweet() { TweetId="123456" });
+
+            _tweetService.Setup(x => x.LikeTweet(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(new Tweet() { TweetId = "123456" });
             var tweetController = new TweetsController(_logger.Object, _userService.Object, _tweetService.Object);
 
-            var response = tweetController.LikeTweet("test","123456");
+            var response = tweetController.LikeTweet("test", "123456");
             response.Result.Should().BeOfType(typeof(Tweet));
         }
 
         [Test]
         public void ReplyTweetTest()
         {
-           
-            _tweetService.Setup(x => x.ReplyTweet(It.IsAny<string>(),It.IsAny<string>(),It.IsAny<TweetReply>())).ReturnsAsync(new Tweet() { TweetId="123456"});
+
+            _tweetService.Setup(x => x.ReplyTweet(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<TweetReply>())).ReturnsAsync(new Tweet() { TweetId = "123456" });
             var tweetController = new TweetsController(_logger.Object, _userService.Object, _tweetService.Object);
 
             var response = tweetController.ReplyTweet("test", "12345", new TweetReply() { Replied_userId = "test1", ReplyMessage = "new Reply" });

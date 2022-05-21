@@ -2,12 +2,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Primitives;
 using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
-using System.Net.Http;
 using System.Threading.Tasks;
+using Tweet_App_API.Exceptions;
 using Tweet_App_API.Model;
 using Tweet_App_API.Services;
 
@@ -18,9 +17,9 @@ namespace Tweet_App_API.Controllers
     [ApiController]
     public class TweetsController : ControllerBase
     {
-        private readonly ILogger<TweetsController> _logger;
+        private readonly ILogger<TweetsController> _logger; //Use Log4Net framework for logging -> log4net.config
         private readonly IUserServices _userService;
-        private readonly ITweetService _tweetService;       
+        private readonly ITweetService _tweetService;
 
         public TweetsController(ILogger<TweetsController> logger, IUserServices userServices, ITweetService tweetService)
         {
@@ -33,7 +32,7 @@ namespace Tweet_App_API.Controllers
         [HttpPost("Register")]
         public async Task<IActionResult> Register(User user)
         {
-            if( ModelState.IsValid )
+            if (ModelState.IsValid)
             {
                 var result = await _userService.Register(user);
                 return Ok(result);
@@ -45,17 +44,20 @@ namespace Tweet_App_API.Controllers
         [HttpGet("Login")]
         public async Task<IActionResult> Login(UserLoginModel userLoginModel)
         {
-           if(ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 var result = await _userService.LoginUser(userLoginModel.UserName, userLoginModel.Password);
+
+                _logger.LogInformation($"{userLoginModel.UserName} User Login Request");
+
                 return Ok(result);
             }
 
-            return BadRequest();            
+            return BadRequest();
         }
 
         [HttpGet("{userName}/forget-Password")]
-        public IActionResult ResetPassWord(string userName,UserLoginModel userLoginModel)
+        public IActionResult ResetPassWord(string userName, UserLoginModel userLoginModel)
         {
             if (ModelState.IsValid)
             {
@@ -67,22 +69,23 @@ namespace Tweet_App_API.Controllers
 
                 return BadRequest("Login Id Incorrect");
             }
-                
+
             return BadRequest("Invalid Model");
         }
 
 
         [HttpGet("users/all")]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAllUsers()
         {
-            return Ok(await _userService.Get());
+            //Return all users
+            return Ok(await _userService.GetAllUsers());
         }
 
         [HttpGet("search/{username}")]
-        public async  Task<IActionResult> GetUserByName(string username)
+        public async Task<IActionResult> GetUserByName(string username) //Email is considered as userName
         {
-          
-             var user = await _userService.GetUserByEmail(username);
+
+            var user = await _userService.GetUserByEmail(username);
 
             return Ok(user);
         }
@@ -90,17 +93,21 @@ namespace Tweet_App_API.Controllers
 
         [Authorize(Policy = "whocanedit")]
         [HttpPost("{userName}/Add")]
-        public async Task<IActionResult> CreateTweet(string userName,Tweet tweet)
+        public async Task<IActionResult> CreateTweet(string userName, Tweet tweet)
         {
-            if(ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 try
                 {
                     var result = await _tweetService.PostTweet(tweet);
+
+                    _logger.LogInformation($"{userName} suucessfully create a tweet with id {result.TweetId}");
+                     
                     return Ok("Tweet Posted Succesfully");
                 }
-                catch(Exception ex)
+                catch (InvalidUserNameException ex)
                 {
+                    _logger.LogInformation(ex.ToString());
                     return BadRequest(ex.ToString());
                 }
             }
@@ -121,8 +128,9 @@ namespace Tweet_App_API.Controllers
                 var result = await _tweetService.GetTweetsByUserId(userName);
                 return Ok(result);
             }
-            catch (Exception ex)
+            catch (InvalidUserNameException ex)
             {
+                _logger.LogInformation(ex.ToString());
                 return BadRequest(ex.ToString());
             }
         }
@@ -135,10 +143,14 @@ namespace Tweet_App_API.Controllers
             try
             {
                 var result = await _tweetService.UpdateTweet(userName, id, tweet);
+
+                _logger.LogInformation($"{userName} suucessfully Update the tweet {id}");
+
                 return Ok(result);
             }
             catch (Exception ex)
             {
+                _logger.LogInformation(ex.ToString());
                 return BadRequest(ex.ToString());
             }
         }
@@ -167,8 +179,9 @@ namespace Tweet_App_API.Controllers
                 var result = await _tweetService.ReplyTweet(userName, id, tweetReply);
                 return Ok(result);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
+                _logger.LogInformation(ex.ToString());
                 return BadRequest(ex.ToString());
             }
         }

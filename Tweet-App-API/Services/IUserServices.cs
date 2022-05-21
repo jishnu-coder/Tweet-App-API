@@ -6,7 +6,7 @@ namespace Tweet_App_API.Services
 {
     public interface IUserServices
     {
-        public Task<List<UserViewModel>> Get();
+        public Task<List<UserViewModel>> GetAllUsers();
 
         public Task<UserViewModel> GetUserByEmail(string email);
 

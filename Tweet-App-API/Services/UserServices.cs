@@ -17,15 +17,16 @@ namespace Tweet_App_API.Services
         private readonly IJwtAuthenticationManager jwtAuthenticationManager;
         private readonly IMapper _mapper;
 
-        public UserServices(IDBClient client, IJwtAuthenticationManager jwtAuthenticationManager , IMapper mapper)
+        public UserServices(IDBClient client, IJwtAuthenticationManager jwtAuthenticationManager, IMapper mapper)
         {
             _users = client.GetUserCollection();
             this.jwtAuthenticationManager = jwtAuthenticationManager;
             _mapper = mapper;
         }
 
-        public async Task<List<UserViewModel>> Get()
+        public async Task<List<UserViewModel>> GetAllUsers()
         {
+
             var users = await _users.FindAsync(usr => true);
             var result = users?.ToList();
 
@@ -53,7 +54,7 @@ namespace Tweet_App_API.Services
 
             try
             {
-                //Hash the password
+                //Hash the password before storing
                 usr.Password = CryptoGraphy.GetHash(usr.Password);
                 await _users.InsertOneAsync(usr);
                 var tokenContainer = jwtAuthenticationManager.Authenticate(usr.Email, usr.Password);
@@ -93,10 +94,11 @@ namespace Tweet_App_API.Services
             userResponse.Email = user.Email;
             userResponse.LoginId = user.LoginId;
 
+            //Create hash value of entered password
             var newHashValue = CryptoGraphy.GetHash(password);
 
-            //Check the password match or Not
 
+            //Check the hash value of entered password and hash password stored in the DB
             if (CryptoGraphy.CompareHash(newHashValue, user.Password))
             {
                 var tokenResponse = jwtAuthenticationManager.Authenticate(user.Email, user.Password);

@@ -6,6 +6,7 @@ namespace Tweet_App_API.Services
 {
     public static class CryptoGraphy
     {
+        //Create the hash value of the source
         public static string GetHash(string source)
         {
             string hashValue;
@@ -20,6 +21,7 @@ namespace Tweet_App_API.Services
             return hashValue;
         }
 
+        //Compare the hash values
         public static Boolean CompareHash(string newHashValue, string compareHash)
         {
             bool beEqual = false;

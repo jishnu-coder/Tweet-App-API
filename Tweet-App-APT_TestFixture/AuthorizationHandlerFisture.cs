@@ -2,12 +2,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection.Metadata;
 using System.Security.Claims;
-using System.Text;
 using System.Threading.Tasks;
 using Tweet_App_API.CustomAuthorization;
 
@@ -30,7 +26,7 @@ namespace Tweet_App_APT_TestFixture
                         );
             var resource = new DefaultHttpContext();
             resource.Request.RouteValues["userName"] = "author";
-            var context = new AuthorizationHandlerContext(requirements, user,resource);
+            var context = new AuthorizationHandlerContext(requirements, user, resource);
             var subject = new CanOnlyEditAndDeleteItsResource();
 
             //Act
@@ -79,7 +75,7 @@ namespace Tweet_App_APT_TestFixture
                             "Basic")
                         );
             var resource = new Document() { };
-            
+
             var context = new AuthorizationHandlerContext(requirements, user, resource);
             var subject = new CanOnlyEditAndDeleteItsResource();
 

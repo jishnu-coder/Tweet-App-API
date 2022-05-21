@@ -66,7 +66,7 @@ namespace Tweet_App_APT_TestFixture
 
             _Client.Setup(x => x.GetTweetCollection()).Returns(_tweet.Object);
 
-            var tweetService = new TweetService(_Client.Object, _guid.Object,_userService.Object);
+            var tweetService = new TweetService(_Client.Object, _guid.Object, _userService.Object);
 
             var response = tweetService.PostTweet(new Tweet() { Content = "New Content", });
 
@@ -107,11 +107,11 @@ namespace Tweet_App_APT_TestFixture
 
             _Client.Setup(x => x.GetTweetCollection()).Returns(_tweet.Object);
 
-            var tweetService = new TweetService(_Client.Object, _guid.Object , _userService.Object);
+            var tweetService = new TweetService(_Client.Object, _guid.Object, _userService.Object);
 
             var response = tweetService.GetTweetsByUserId("jishnu123");
 
-
+            response.Exception.Should().BeNull();
         }
 
         [Test]
@@ -148,9 +148,9 @@ namespace Tweet_App_APT_TestFixture
 
             _Client.Setup(x => x.GetTweetCollection()).Returns(_tweet.Object);
 
-            var tweetService = new TweetService(_Client.Object, _guid.Object,_userService.Object);
+            var tweetService = new TweetService(_Client.Object, _guid.Object, _userService.Object);
 
-            var response = tweetService.UpdateTweet("test","9D2B0228-4D0D-4C23-8B49-01A698857709", new Tweet()
+            var response = tweetService.UpdateTweet("test", "9D2B0228-4D0D-4C23-8B49-01A698857709", new Tweet()
             {
                 TweetId = new Guid("9D2B0228-4D0D-4C23-8B49-01A698857709").ToString(),
                 CreatorId = "jishnu123",
@@ -196,7 +196,7 @@ namespace Tweet_App_APT_TestFixture
 
             _Client.Setup(x => x.GetTweetCollection()).Returns(_tweet.Object);
 
-            var tweetService = new TweetService(_Client.Object, _guid.Object,_userService.Object);
+            var tweetService = new TweetService(_Client.Object, _guid.Object, _userService.Object);
 
             var response = tweetService.LikeTweet("jishnu@gmail.com", "9D2B0228-4D0D-4C23-8B49-01A698857709");
 
@@ -237,7 +237,7 @@ namespace Tweet_App_APT_TestFixture
 
             _Client.Setup(x => x.GetTweetCollection()).Returns(_tweet.Object);
 
-            var tweetService = new TweetService(_Client.Object, _guid.Object,_userService.Object);
+            var tweetService = new TweetService(_Client.Object, _guid.Object, _userService.Object);
 
             var response = tweetService.ReplyTweet("jishnu@gmail.com", "9D2B0228-4D0D-4C23-8B49-01A698857709", new TweetReply() { Replied_userId = "jishnu@gmail.com", ReplyMessage = "Super..." });
 

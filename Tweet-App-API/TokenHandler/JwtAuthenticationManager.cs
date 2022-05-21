@@ -11,17 +11,18 @@ namespace Tweet_App_API.TokenHandler
     public class JwtAuthenticationManager : IJwtAuthenticationManager
     {
         private readonly string Key;
-      
+
         private readonly IRefreshTokenGenerator refreshTokenGenerator;
 
         public JwtAuthenticationManager(IRefreshTokenGenerator refreshTokenGenerator, IConfiguration configuration)
         {
-          
+
             Key = configuration["JWT:Key"];
             this.refreshTokenGenerator = refreshTokenGenerator;
-           
+
         }
 
+        //Return the Jwt token and refresh toke for the Authenticated User
         public TokenResponse Authenticate(string email, string password)
         {
             var tokenHandler = new JwtSecurityTokenHandler();// install System.IdentityModel.Tokens.Jwt
@@ -34,6 +35,7 @@ namespace Tweet_App_API.TokenHandler
 
                 }
                 ),
+                //Add expiry of 30 minutes
                 Expires = DateTime.UtcNow.AddMinutes(30),
                 SigningCredentials = new SigningCredentials(
                     new SymmetricSecurityKey(tokenKey),

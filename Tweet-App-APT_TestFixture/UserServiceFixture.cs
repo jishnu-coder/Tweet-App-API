@@ -26,7 +26,7 @@ namespace Tweet_App_APT_TestFixture
             _users = new Mock<IMongoCollection<User>>();
             jwtAuthenticationManager = new Mock<IJwtAuthenticationManager>();
             _mapper = new Mock<IMapper>();
-           // _mapper.Setup(x => x.Map<User, UserViewModel>(It.IsAny<User>())).Returns(new UserViewModel() { Email = "test1@gmail.com" });
+            // _mapper.Setup(x => x.Map<User, UserViewModel>(It.IsAny<User>())).Returns(new UserViewModel() { Email = "test1@gmail.com" });
         }
 
         [Test]
@@ -75,9 +75,9 @@ namespace Tweet_App_APT_TestFixture
             var DbClient = new Mock<IDBClient>();
             DbClient.Setup(x => x.GetUserCollection()).Returns(_users.Object);
 
-            
-            
-            var userService = new UserServices(DbClient.Object, jwtAuthenticationManager.Object,new Mapper(
+
+
+            var userService = new UserServices(DbClient.Object, jwtAuthenticationManager.Object, new Mapper(
                  new MapperConfiguration(cfg => cfg.AddProfile(typeof(UserProfile))
                 )));
 
@@ -144,7 +144,7 @@ namespace Tweet_App_APT_TestFixture
             var DbClient = new Mock<IDBClient>();
             DbClient.Setup(x => x.GetUserCollection()).Returns(_users.Object);
 
-            var userService = new UserServices(DbClient.Object, jwtAuthenticationManager.Object,_mapper.Object);
+            var userService = new UserServices(DbClient.Object, jwtAuthenticationManager.Object, _mapper.Object);
 
             var result = userService.Register(user);
 

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Tweet_App_API.DataBaseLayer;
+using Tweet_App_API.Exceptions;
 using Tweet_App_API.Model;
 
 namespace Tweet_App_API.Services
@@ -15,7 +16,7 @@ namespace Tweet_App_API.Services
         private readonly IGuidService guidService;
         private readonly IUserServices userServices;
 
-        public TweetService(IDBClient client, IGuidService guidService , IUserServices userServices)
+        public TweetService(IDBClient client, IGuidService guidService, IUserServices userServices)
         {
             _tweet = client.GetTweetCollection();
             this.guidService = guidService;
@@ -25,7 +26,7 @@ namespace Tweet_App_API.Services
         public async Task<Tweet> PostTweet(Tweet tweet)
         {
             var isAValidCreator = await userServices.GetUserByEmail(tweet.CreatorId);
-            if(isAValidCreator == null)
+            if (isAValidCreator == null)
             {
                 throw new Exception("Not a Valid creator");
             }
@@ -48,20 +49,21 @@ namespace Tweet_App_API.Services
 
         public async Task<List<Tweet>> GetTweetsByUserId(string userName)
         {
+            //Check the userName is valid , if not throw exception
             var isAValidCreator = await userServices.GetUserByEmail(userName);
             if (isAValidCreator == null)
             {
-                throw new Exception("Not a Valid creator");
+                throw new InvalidUserNameException("Not a Valid creator");
             }
             var result = await _tweet.FindAsync(x => x.CreatorId == userName);
             return result.ToList();
         }
 
-        public async Task<Tweet> UpdateTweet(string username,string tweetid, Tweet tweet)
+        public async Task<Tweet> UpdateTweet(string username, string tweetid, Tweet tweet)
         {
-            if (await isValidUser(username) && await isValidTweet(tweetid))
+            //Check if the userName and  tweet id are valid 
+            if (await isValidUser(tweet.CreatorId) && await isValidTweet(tweetid))
             {
-
                 tweet.CreateTime = DateTime.Now;
                 tweet.Tags = tweet.Tags == null ? new List<string>() { } : tweet.Tags;
                 var filter = new BsonDocument("tweetId", tweet.TweetId);
@@ -70,9 +72,9 @@ namespace Tweet_App_API.Services
                 await _tweet.FindOneAndUpdateAsync<Tweet>(filter, update);
             }
 
-            var data = await GetTweetByTweetId(tweet.TweetId);
+            var updatedTweet = await GetTweetByTweetId(tweet.TweetId);
 
-            return data;
+            return updatedTweet;
         }
 
         public async Task<DeleteResult> DeleteTweet(string tweetid)
@@ -93,7 +95,8 @@ namespace Tweet_App_API.Services
         public async Task<Tweet> LikeTweet(string userId, string tweetId)
         {
             var tweet = await GetTweetByTweetId(tweetId);
-            if ( tweet != null && !tweet.Likes.Contains(userId))
+            //Check the tweet id is Valid and if the user already liked bypass the flow
+            if (tweet != null && !tweet.Likes.Contains(userId))
             {
                 var filter = new BsonDocument("tweetId", tweetId);
                 var update = Builders<Tweet>.Update.AddToSet("likes", userId);
@@ -111,14 +114,13 @@ namespace Tweet_App_API.Services
         {
             if (await isValidUser(userId) && await isValidTweet(tweetId))
             {
-
                 replyTweet.Reply_Time = DateTime.Now;
                 replyTweet.Replied_userId = userId;
                 var filter = new BsonDocument("tweetId", tweetId);
                 var update = Builders<Tweet>.Update.AddToSet("replys", replyTweet);
 
                 await _tweet.FindOneAndUpdateAsync<Tweet>(filter, update);
-               
+
             }
             return await GetTweetByTweetId(tweetId);
         }
@@ -130,7 +132,7 @@ namespace Tweet_App_API.Services
             if (user != null)
                 return true;
 
-            throw new Exception("Invalid user Id");
+            throw new InvalidUserNameException("Invalid user Id");
 
         }
 
@@ -141,7 +143,7 @@ namespace Tweet_App_API.Services
             if (tweet != null)
                 return true;
 
-            throw new Exception("Invalid tweet Id");
+            throw new InvalidTweetIdException("Invalid tweet Id");
 
         }
     }
