@@ -102,7 +102,7 @@ namespace Tweet_App_API.Controllers
                     var result = await _tweetService.PostTweet(tweet);
 
                     _logger.LogInformation($"{userName} suucessfully create a tweet with id {result.TweetId}");
-                     
+
                     return Ok("Tweet Posted Succesfully");
                 }
                 catch (InvalidUserNameException ex)

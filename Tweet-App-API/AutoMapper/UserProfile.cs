@@ -8,7 +8,7 @@ namespace Tweet_App_API.AutoMapper
         public UserProfile()
         {
             CreateMap<User, UserViewModel>();
-        
+
         }
     }
 }
