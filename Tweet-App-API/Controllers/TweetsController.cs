@@ -57,17 +57,17 @@ namespace Tweet_App_API.Controllers
         }
 
         [HttpGet("{userName}/forget-Password")]
-        public IActionResult ResetPassWord(string userName, UserLoginModel userLoginModel)
+        public async Task<IActionResult> ResetPassWord(string userName, UserLoginModel userLoginModel)
         {
             if (ModelState.IsValid)
             {
-                if (_userService.ResetPassword(userLoginModel.UserName, userLoginModel.Password))
+                if (await _userService.ResetPassword(userLoginModel.UserName, userLoginModel.Password , userLoginModel.ContactNumber))
                 {
                     _logger.LogInformation($"{userLoginModel.UserName} suucessfully update the password");
                     return Ok("Password Successfully Changed");
                 }
 
-                return BadRequest("Login Id Incorrect");
+                return BadRequest("Login Id or Contact Number Incorrect");
             }
 
             return BadRequest("Invalid Model");

@@ -260,7 +260,7 @@ namespace Tweet_App_APT_TestFixture
         }
 
         [Test]
-        public void ResetPasswordTest()
+        public void ResetPasswordTest_Failed()
         {
             var user = new User()
             {
@@ -269,6 +269,43 @@ namespace Tweet_App_APT_TestFixture
                 Email = "test@gmail.com",
                 LoginId = "test123",
                 Password = "XohImNooBHFR0OVvjcYpJ3NgPQ1qq73WKhHvch0VQtg="
+
+            };
+            var userList = new List<User>();
+           
+
+            Mock<IAsyncCursor<User>> _userCursor = new Mock<IAsyncCursor<User>>();
+
+            //mock movenext
+            _userCursor.Setup(_ => _.Current).Returns(userList);
+            _userCursor
+                .SetupSequence(_ => _.MoveNext(It.IsAny<CancellationToken>()))
+                .Returns(true)
+                .Returns(false);
+
+            _users.Setup(op => op.FindAsync(It.IsAny<FilterDefinition<User>>(),
+                            It.IsAny<FindOptions<User, User>>(),
+                            It.IsAny<CancellationToken>())).ReturnsAsync(_userCursor.Object);
+
+            var DbClient = new Mock<IDBClient>();
+            DbClient.Setup(x => x.GetUserCollection()).Returns(_users.Object);
+
+            var userService = new UserServices(DbClient.Object, jwtAuthenticationManager.Object, _mapper.Object);
+
+            var result = userService.ResetPassword("test1", "newPassword","9744418234");
+
+            result.Result.Should().Be(false);
+        }
+
+        [Test]
+        public void ResetPassword_Success()
+        {
+            var user = new User()
+            {
+                FirstName = "Test",
+                LastName = "User",
+                Email = "test@gmail.com",
+                LoginId = "test123"
 
             };
             var userList = new List<User>();
@@ -295,22 +332,26 @@ namespace Tweet_App_APT_TestFixture
             //mock movenext
             _userCursor.Setup(_ => _.Current).Returns(userList);
             _userCursor
-                .SetupSequence(_ => _.MoveNext(It.IsAny<CancellationToken>()))
-                .Returns(true)
-                .Returns(false);
+                .SetupSequence(_ => _.MoveNextAsync(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(true)
+                .ReturnsAsync(false);
 
-            _users.Setup(op => op.FindSync(It.IsAny<FilterDefinition<User>>(),
+            _users.Setup(op => op.FindAsync<User>(It.IsAny<FilterDefinition<User>>(),
                             It.IsAny<FindOptions<User, User>>(),
-                            It.IsAny<CancellationToken>())).Returns(_userCursor.Object);
+                            It.IsAny<CancellationToken>())).ReturnsAsync(_userCursor.Object);
 
             var DbClient = new Mock<IDBClient>();
             DbClient.Setup(x => x.GetUserCollection()).Returns(_users.Object);
 
-            var userService = new UserServices(DbClient.Object, jwtAuthenticationManager.Object, _mapper.Object);
 
-            var result = userService.ResetPassword("test1", "newPassword");
 
-            result.Should().Be(true);
+            var userService = new UserServices(DbClient.Object, jwtAuthenticationManager.Object, new Mapper(
+                 new MapperConfiguration(cfg => cfg.AddProfile(typeof(UserProfile))
+                )));
+
+            var result = userService.ResetPassword("test1","newPass","87656790");
+
+            result.Result.Should().Be(true);
         }
     }
 }

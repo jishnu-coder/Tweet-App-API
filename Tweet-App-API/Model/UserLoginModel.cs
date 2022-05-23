@@ -9,5 +9,7 @@ namespace Tweet_App_API.Model
 
         [Required]
         public string Password { get; set; }
+
+        public string ContactNumber { get; set; }
     }
 }

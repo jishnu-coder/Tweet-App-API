@@ -98,39 +98,39 @@ namespace Tweet_App_APT_TestFixture
         public void ResetPasswordTestSuccess()
         {
 
-            _userService.Setup(x => x.ResetPassword(It.IsAny<string>(), It.IsAny<string>())).Returns(true);
+            _userService.Setup(x => x.ResetPassword(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(true);
             var tweetController = new TweetsController(_logger.Object, _userService.Object, _tweetService.Object);
 
             var response = tweetController.ResetPassWord("test1230", new UserLoginModel() { UserName = "test123", Password = "password" });
 
-            response.Should().BeOfType(typeof(OkObjectResult));
+            response.Result.Should().BeOfType(typeof(OkObjectResult));
         }
 
         [Test]
         public void ResetPasswordTestFail()
         {
 
-            _userService.Setup(x => x.ResetPassword(It.IsAny<string>(), It.IsAny<string>())).Returns(false);
+            _userService.Setup(x => x.ResetPassword(It.IsAny<string>(), It.IsAny<string>() , It.IsAny<string>())).ReturnsAsync(false);
             var tweetController = new TweetsController(_logger.Object, _userService.Object, _tweetService.Object);
 
             var response = tweetController.ResetPassWord("test@123", new UserLoginModel() { UserName = "test123", Password = "password" });
 
 
-            response.Should().BeOfType(typeof(BadRequestObjectResult));
+            response.Result.Should().BeOfType(typeof(BadRequestObjectResult));
         }
 
         [Test]
         public void ResetPasswordTestFail_ModelState_Invalid()
         {
 
-            _userService.Setup(x => x.ResetPassword(It.IsAny<string>(), It.IsAny<string>())).Returns(false);
+            _userService.Setup(x => x.ResetPassword(It.IsAny<string>(), It.IsAny<string>(),It.IsAny<string>())).ReturnsAsync(false);
             var tweetController = new TweetsController(_logger.Object, _userService.Object, _tweetService.Object);
 
             tweetController.ModelState.AddModelError("test", "test");
 
             var response = tweetController.ResetPassWord("test@123", new UserLoginModel() { UserName = "test123", Password = "password" });
 
-            response.Should().BeOfType(typeof(BadRequestObjectResult));
+            response.Result.Should().BeOfType(typeof(BadRequestObjectResult));
         }
 
         [Test]

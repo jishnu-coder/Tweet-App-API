@@ -30,15 +30,22 @@ namespace Tweet_App_API.Services
             {
                 throw new InvalidUserNameException("Not a Valid creator");
             }
-            //Add Guid as tweet id
-            tweet.TweetId = guidService.NewGuid().ToString();
-            tweet.CreateTime = DateTime.Now;
 
-            tweet.Likes = tweet.Likes == null ? new List<string>() { } : tweet.Likes;
-            tweet.Tags = tweet.Tags == null ? new List<string>() { } : tweet.Tags;
-            tweet.Replys = tweet.Replys == null ? new List<TweetReply>() { } : tweet.Replys;
+            tweet.Tags = tweet.Tags == null ? new List<string>() : tweet.Tags;
 
-            await _tweet.InsertOneAsync(tweet);
+            if(TweetLengthAndTagLengthValidation(tweet.Content,tweet.Tags))
+            {
+                //Add Guid as tweet id
+                tweet.TweetId = guidService.NewGuid().ToString();
+                tweet.CreateTime = DateTime.Now;
+
+                tweet.Likes = tweet.Likes == null ? new List<string>() { } : tweet.Likes;
+               
+                tweet.Replys = tweet.Replys == null ? new List<TweetReply>() { } : tweet.Replys;
+
+                await _tweet.InsertOneAsync(tweet);
+            }
+            
             return await GetTweetByTweetId(tweet.TweetId);
         }
 
@@ -61,11 +68,11 @@ namespace Tweet_App_API.Services
 
         public async Task<Tweet> UpdateTweet(string userName, string tweetid, Tweet tweet)
         {
+            tweet.Tags = tweet.Tags == null ? new List<string>() { } : tweet.Tags;
             //Check if the userName and  tweet id are valid 
-            if (await isValidUser(tweet.CreatorId) && await isValidTweet(tweetid))
+            if (await isValidUser(tweet.CreatorId) && await isValidTweet(tweetid) && TweetLengthAndTagLengthValidation(tweet.Content, tweet.Tags))
             {
-                tweet.CreateTime = DateTime.Now;
-                tweet.Tags = tweet.Tags == null ? new List<string>() { } : tweet.Tags;
+                tweet.CreateTime = DateTime.Now;                
                 var filter = new BsonDocument("tweetId", tweet.TweetId);
                 var update = Builders<Tweet>.Update.Set("content", tweet.Content).
                            Set("tags", tweet.Tags).Set("createTime", tweet.CreateTime);
@@ -112,7 +119,8 @@ namespace Tweet_App_API.Services
 
         public async Task<Tweet> ReplyTweet(string userId, string tweetId, TweetReply replyTweet)
         {
-            if (await isValidUser(userId) && await isValidTweet(tweetId))
+            if (await isValidUser(userId) && await isValidTweet(tweetId)
+                && TweetLengthAndTagLengthValidation(replyTweet.ReplyMessage, new List<string>()))
             {
                 replyTweet.Reply_Time = DateTime.Now;
                 replyTweet.Replied_userId = userId;
@@ -145,6 +153,24 @@ namespace Tweet_App_API.Services
 
             throw new InvalidTweetIdException("Invalid tweet Id");
 
+        }
+
+        private bool TweetLengthAndTagLengthValidation(string content,List<string> tags)
+        {
+           foreach(var tag in tags)
+            {
+                if(tag.Length > 50)
+                {
+                    throw new TweetLengthExceedException("Tag length should be less that 50 charactor");
+                }
+            }
+
+           if(content.Length > 144)
+            {
+                throw new TweetLengthExceedException("Tweet length should be less that 50 charactor");
+            }
+
+            return true;
         }
     }
 }

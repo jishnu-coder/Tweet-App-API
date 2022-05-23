@@ -44,11 +44,15 @@ namespace Tweet_App_API.Model
 
     public class TweetReply
     {
+        [Required]
         public string Replied_userId { get; set; }
 
+        [Required]
         public string ReplyMessage { get; set; }
 
         public DateTime Reply_Time { get; set; }
+
+        public List<string> ReplyTags { get; set; }
     }
 
 }
