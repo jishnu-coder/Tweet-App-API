@@ -98,7 +98,7 @@ namespace Tweet_App_API.Services
 
             if (user == null)
             {
-                userResponse.Errors.Add("Invalid Log in ID");
+                userResponse.Errors.Add("Invalid Email ID");
                 return userResponse;
             }
 
@@ -118,6 +118,7 @@ namespace Tweet_App_API.Services
                 return userResponse;
             }
 
+            userResponse.LoginId = null;
             userResponse.Errors.Add("Incorrect Pssword");
             return userResponse;
         }

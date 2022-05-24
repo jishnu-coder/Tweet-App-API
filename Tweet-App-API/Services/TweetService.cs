@@ -155,19 +155,19 @@ namespace Tweet_App_API.Services
 
         }
 
-        private bool TweetLengthAndTagLengthValidation(string content, List<string> tags)
+        private static bool TweetLengthAndTagLengthValidation(string content, List<string> tags)
         {
             foreach (var tag in tags)
             {
                 if (tag.Length > 50)
                 {
-                    throw new TweetLengthExceedException("Tag length should be less that 50 charactor");
+                    throw new TweetLengthExceedException("Tag length should be less than 50 charactor");
                 }
             }
 
             if (content.Length > 144)
             {
-                throw new TweetLengthExceedException("Tweet length should be less that 50 charactor");
+                throw new TweetLengthExceedException("Tweet length should be less than 50 charactor");
             }
 
             return true;

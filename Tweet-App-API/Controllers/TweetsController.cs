@@ -56,6 +56,7 @@ namespace Tweet_App_API.Controllers
             return BadRequest();
         }
 
+        [AllowAnonymous]
         [HttpGet("{userName}/forget-Password")]
         public async Task<IActionResult> ResetPassWord(string userName, UserLoginModel userLoginModel)
         {
