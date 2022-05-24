@@ -61,7 +61,7 @@ namespace Tweet_App_API.Controllers
         {
             if (ModelState.IsValid)
             {
-                if (await _userService.ResetPassword(userLoginModel.UserName, userLoginModel.Password , userLoginModel.ContactNumber))
+                if (await _userService.ResetPassword(userLoginModel.UserName, userLoginModel.Password, userLoginModel.ContactNumber))
                 {
                     _logger.LogInformation($"{userLoginModel.UserName} suucessfully update the password");
                     return Ok("Password Successfully Changed");
@@ -101,11 +101,11 @@ namespace Tweet_App_API.Controllers
                 {
                     var result = await _tweetService.PostTweet(tweet);
 
-                    _logger.LogInformation($"{userName} suucessfully create a tweet with id {result.TweetId}");
+                    _logger.LogInformation($"{userName} sucessfully create a tweet with id {result.TweetId}");
 
                     return Ok("Tweet Posted Succesfully");
                 }
-                catch (InvalidUserNameException ex)
+                catch (Exception ex)
                 {
                     _logger.LogInformation(ex.ToString());
                     return BadRequest(ex.ToString());

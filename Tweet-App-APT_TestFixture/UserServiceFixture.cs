@@ -272,7 +272,7 @@ namespace Tweet_App_APT_TestFixture
 
             };
             var userList = new List<User>();
-           
+
 
             Mock<IAsyncCursor<User>> _userCursor = new Mock<IAsyncCursor<User>>();
 
@@ -292,7 +292,7 @@ namespace Tweet_App_APT_TestFixture
 
             var userService = new UserServices(DbClient.Object, jwtAuthenticationManager.Object, _mapper.Object);
 
-            var result = userService.ResetPassword("test1", "newPassword","9744418234");
+            var result = userService.ResetPassword("test1", "newPassword", "9744418234");
 
             result.Result.Should().Be(false);
         }
@@ -349,7 +349,7 @@ namespace Tweet_App_APT_TestFixture
                  new MapperConfiguration(cfg => cfg.AddProfile(typeof(UserProfile))
                 )));
 
-            var result = userService.ResetPassword("test1","newPass","87656790");
+            var result = userService.ResetPassword("test1", "newPass", "87656790");
 
             result.Result.Should().Be(true);
         }

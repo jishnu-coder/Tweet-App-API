@@ -110,7 +110,7 @@ namespace Tweet_App_APT_TestFixture
         public void ResetPasswordTestFail()
         {
 
-            _userService.Setup(x => x.ResetPassword(It.IsAny<string>(), It.IsAny<string>() , It.IsAny<string>())).ReturnsAsync(false);
+            _userService.Setup(x => x.ResetPassword(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(false);
             var tweetController = new TweetsController(_logger.Object, _userService.Object, _tweetService.Object);
 
             var response = tweetController.ResetPassWord("test@123", new UserLoginModel() { UserName = "test123", Password = "password" });
@@ -123,7 +123,7 @@ namespace Tweet_App_APT_TestFixture
         public void ResetPasswordTestFail_ModelState_Invalid()
         {
 
-            _userService.Setup(x => x.ResetPassword(It.IsAny<string>(), It.IsAny<string>(),It.IsAny<string>())).ReturnsAsync(false);
+            _userService.Setup(x => x.ResetPassword(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(false);
             var tweetController = new TweetsController(_logger.Object, _userService.Object, _tweetService.Object);
 
             tweetController.ModelState.AddModelError("test", "test");

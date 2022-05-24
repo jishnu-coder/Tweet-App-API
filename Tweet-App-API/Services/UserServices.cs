@@ -24,11 +24,11 @@ namespace Tweet_App_API.Services
             _mapper = mapper;
         }
 
-        private async Task<UserViewModel> GetUserByConatctAndEmail(string email,string conatctNumber)
+        private async Task<UserViewModel> GetUserByConatctAndEmail(string email, string conatctNumber)
         {
-            var user =  await _users.FindAsync<User>(emp => emp.Email.Equals(email) && emp.ContactNumber.Equals(conatctNumber));
+            var user = await _users.FindAsync<User>(emp => emp.Email.Equals(email) && emp.ContactNumber.Equals(conatctNumber));
 
-            var result =  await user?.FirstOrDefaultAsync();
+            var result = await user?.FirstOrDefaultAsync();
 
             UserViewModel userViewModel = _mapper.Map<UserViewModel>(result);
 
@@ -122,9 +122,9 @@ namespace Tweet_App_API.Services
             return userResponse;
         }
 
-        public async Task<bool> ResetPassword(string email, string newPassword , string contactNumber)
+        public async Task<bool> ResetPassword(string email, string newPassword, string contactNumber)
         {
-            var user =  await GetUserByConatctAndEmail(email,contactNumber);
+            var user = await GetUserByConatctAndEmail(email, contactNumber);
             if (user != null)
             {
                 var hashPassword = CryptoGraphy.GetHash(newPassword);

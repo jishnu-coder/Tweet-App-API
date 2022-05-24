@@ -33,19 +33,19 @@ namespace Tweet_App_API.Services
 
             tweet.Tags = tweet.Tags == null ? new List<string>() : tweet.Tags;
 
-            if(TweetLengthAndTagLengthValidation(tweet.Content,tweet.Tags))
+            if (TweetLengthAndTagLengthValidation(tweet.Content, tweet.Tags))
             {
                 //Add Guid as tweet id
                 tweet.TweetId = guidService.NewGuid().ToString();
                 tweet.CreateTime = DateTime.Now;
 
                 tweet.Likes = tweet.Likes == null ? new List<string>() { } : tweet.Likes;
-               
+
                 tweet.Replys = tweet.Replys == null ? new List<TweetReply>() { } : tweet.Replys;
 
                 await _tweet.InsertOneAsync(tweet);
             }
-            
+
             return await GetTweetByTweetId(tweet.TweetId);
         }
 
@@ -72,7 +72,7 @@ namespace Tweet_App_API.Services
             //Check if the userName and  tweet id are valid 
             if (await isValidUser(tweet.CreatorId) && await isValidTweet(tweetid) && TweetLengthAndTagLengthValidation(tweet.Content, tweet.Tags))
             {
-                tweet.CreateTime = DateTime.Now;                
+                tweet.CreateTime = DateTime.Now;
                 var filter = new BsonDocument("tweetId", tweet.TweetId);
                 var update = Builders<Tweet>.Update.Set("content", tweet.Content).
                            Set("tags", tweet.Tags).Set("createTime", tweet.CreateTime);
@@ -155,17 +155,17 @@ namespace Tweet_App_API.Services
 
         }
 
-        private bool TweetLengthAndTagLengthValidation(string content,List<string> tags)
+        private bool TweetLengthAndTagLengthValidation(string content, List<string> tags)
         {
-           foreach(var tag in tags)
+            foreach (var tag in tags)
             {
-                if(tag.Length > 50)
+                if (tag.Length > 50)
                 {
                     throw new TweetLengthExceedException("Tag length should be less that 50 charactor");
                 }
             }
 
-           if(content.Length > 144)
+            if (content.Length > 144)
             {
                 throw new TweetLengthExceedException("Tweet length should be less that 50 charactor");
             }
