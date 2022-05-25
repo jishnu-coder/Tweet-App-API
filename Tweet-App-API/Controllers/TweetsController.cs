@@ -41,7 +41,7 @@ namespace Tweet_App_API.Controllers
         }
 
         [AllowAnonymous]
-        [HttpGet("Login")]
+        [HttpPost("Login")]
         public async Task<IActionResult> Login(UserLoginModel userLoginModel)
         {
             if (ModelState.IsValid)
@@ -57,7 +57,7 @@ namespace Tweet_App_API.Controllers
         }
 
         [AllowAnonymous]
-        [HttpGet("{userName}/forget-Password")]
+        [HttpPost("{userName}/forget-Password")]
         public async Task<IActionResult> ResetPassWord(string userName, UserLoginModel userLoginModel)
         {
             if (ModelState.IsValid)
