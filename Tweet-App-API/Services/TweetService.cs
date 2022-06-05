@@ -25,14 +25,14 @@ namespace Tweet_App_API.Services
 
         public async Task<Tweet> PostTweet(Tweet tweet)
         {
-            var isAValidCreator = await userServices.GetUserByEmail(tweet.CreatorId);
+            var isAValidCreator = await userServices.GetUserByEmail(tweet.Creator.CreatorId);
             if (isAValidCreator == null)
             {
                 throw new InvalidUserNameException("Not a Valid creator");
             }
 
             tweet.Tags = tweet.Tags == null ? new List<string>() : tweet.Tags;
-
+            tweet.Creator.Seq = isAValidCreator.Seq;
             if (TweetLengthAndTagLengthValidation(tweet.Content, tweet.Tags))
             {
                 //Add Guid as tweet id
@@ -51,7 +51,23 @@ namespace Tweet_App_API.Services
 
         public List<Tweet> GetAll()
         {
-            return _tweet.AsQueryable().ToList();
+            var tweetList = _tweet.AsQueryable().OrderByDescending(x => x.CreateTime).ToList();
+
+            foreach(var tweet in tweetList)
+            {
+                tweet.DateTimeStamp = TweetTimeStamp(TimeZoneInfo.ConvertTimeFromUtc(tweet.CreateTime,TimeZoneInfo.FindSystemTimeZoneById("India Standard Time")));
+                
+                tweet.Replys = tweet.Replys.OrderByDescending(x => x.Reply_Time).ToList();
+
+                foreach(var reply in tweet.Replys)
+                {
+                    reply.Reply_Time_Stamp = TweetTimeStamp(TimeZoneInfo.ConvertTimeFromUtc(reply.Reply_Time, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time")));
+                }
+
+
+            }
+
+            return tweetList;
         }
 
         public async Task<List<Tweet>> GetTweetsByUserId(string userName)
@@ -62,15 +78,35 @@ namespace Tweet_App_API.Services
             {
                 throw new InvalidUserNameException("Not a Valid creator");
             }
-            var result = await _tweet.FindAsync(x => x.CreatorId == userName);
-            return result.ToList();
+            var result = await _tweet.FindAsync(x => x.Creator.CreatorId == userName);
+
+            var data = result.ToList();
+
+            data = data.OrderByDescending(x => x.CreateTime).ToList();
+
+            foreach (var tweet in data)
+            {
+                tweet.DateTimeStamp = TweetTimeStamp(TimeZoneInfo.ConvertTimeFromUtc(tweet.CreateTime, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time")));
+
+                tweet.Replys = tweet.Replys.OrderByDescending(x => x.Reply_Time).ToList();
+
+                foreach (var reply in tweet.Replys)
+                {
+                    reply.Reply_Time_Stamp = TweetTimeStamp(TimeZoneInfo.ConvertTimeFromUtc(reply.Reply_Time, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time")));
+                }
+
+
+            }
+
+            return data;
+
         }
 
         public async Task<Tweet> UpdateTweet(string userName, string tweetid, Tweet tweet)
         {
             tweet.Tags = tweet.Tags == null ? new List<string>() { } : tweet.Tags;
             //Check if the userName and  tweet id are valid 
-            if (await isValidUser(tweet.CreatorId) && await isValidTweet(tweetid) && TweetLengthAndTagLengthValidation(tweet.Content, tweet.Tags))
+            if (await isValidUser(tweet.Creator.CreatorId) && await isValidTweet(tweetid) && TweetLengthAndTagLengthValidation(tweet.Content, tweet.Tags))
             {
                 tweet.CreateTime = DateTime.Now;
                 var filter = new BsonDocument("tweetId", tweet.TweetId);
@@ -171,6 +207,34 @@ namespace Tweet_App_API.Services
             }
 
             return true;
+        }
+
+        private static string TweetTimeStamp (DateTime createTime)
+        {
+            TimeSpan ts = DateTime.Now - createTime;
+
+            var minutes = ts.TotalMinutes;
+
+            if(minutes < 1)
+            {
+                return "Just Now";
+            }
+
+            if(minutes < 60)
+            {
+                return $"{(int)minutes} Minutes ago";
+            }
+
+            if(minutes < 1440)
+            {
+                var hours = (int)minutes / 60;
+
+                return $"{hours} Hours ago";
+            }
+
+            return $"{(int)minutes / 1440} Days ago";
+            
+            
         }
     }
 }

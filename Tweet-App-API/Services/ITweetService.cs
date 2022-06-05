@@ -21,5 +21,7 @@ namespace Tweet_App_API.Services
 
         public Task<Tweet> ReplyTweet(string userId, string tweetId, TweetReply replyTweet);
 
+        public  Task<Tweet> GetTweetByTweetId(string id);
+
     }
 }

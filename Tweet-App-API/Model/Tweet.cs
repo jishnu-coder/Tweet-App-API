@@ -20,7 +20,7 @@ namespace Tweet_App_API.Model
         [Required]
         [BsonRequired]
         [BsonElement("creatorId")]
-        public string CreatorId { get; set; }
+        public Creator Creator { get; set; }
 
         [Required]
         [BsonRequired]
@@ -31,6 +31,7 @@ namespace Tweet_App_API.Model
         [BsonElement("createTime")]
         public DateTime CreateTime { get; set; }
 
+        public string DateTimeStamp { get; set; }
 
         [BsonElement("tags")]
         public List<string> Tags { get; set; }
@@ -52,7 +53,18 @@ namespace Tweet_App_API.Model
 
         public DateTime Reply_Time { get; set; }
 
+        public string Reply_Time_Stamp { get; set; }
+
         public List<string> ReplyTags { get; set; }
+    }
+
+    public class Creator
+    {
+        [Required]
+        public string CreatorId { get; set; }
+
+        
+        public int Seq { get; set; }
     }
 
 }

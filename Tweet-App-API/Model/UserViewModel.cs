@@ -8,6 +8,8 @@
 
         public string Email { get; set; }
 
+        public int Seq { get; set; }
+
         public string ContactNumber { get; set; }
     }
 }

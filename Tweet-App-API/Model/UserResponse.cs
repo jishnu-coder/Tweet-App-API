@@ -8,6 +8,8 @@ namespace Tweet_App_API.Model
 
         public string Email { get; set; }
 
+        public int Seq { get; set; }
+
         public string Token { get; set; }
 
         public string RefreshToken { get; set; }

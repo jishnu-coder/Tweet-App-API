@@ -42,6 +42,9 @@ namespace Tweet_App_API.Model
         [BsonElement("contactNumber")]
         public string ContactNumber { get; set; }
 
+        [BsonElement("Seq")]
+        public int Seq { get; set; }
+
     }
 
 }

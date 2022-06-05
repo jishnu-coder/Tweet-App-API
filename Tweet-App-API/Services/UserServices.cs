@@ -57,11 +57,27 @@ namespace Tweet_App_API.Services
             return userViewModel;
         }
 
+        private int GetNextSequence(List<UserViewModel> exisitingRecords)
+        {
+           var preSeq = exisitingRecords.Max(x => x.Seq);
+            return preSeq + 1;
+        }
+
 
         public async Task<UserResponse> Register(User usr)
         {
             usr.LoginId = usr.FirstName + Guid.NewGuid().ToString();
             var responsse = new UserResponse() { Email = usr.Email, LoginId = usr.LoginId, Errors = new List<string>() };
+
+            var exisitingRecords = await GetAllUsers();
+            if(!exisitingRecords.Any())
+            {
+                usr.Seq = 0;
+            }
+            else
+            {
+                usr.Seq =  GetNextSequence(exisitingRecords);
+            }
 
             try
             {
@@ -71,6 +87,7 @@ namespace Tweet_App_API.Services
                 var tokenContainer = jwtAuthenticationManager.Authenticate(usr.Email, usr.Password);
                 responsse.Token = tokenContainer.Token;
                 responsse.RefreshToken = tokenContainer.RefreshToken;
+                responsse.Seq = usr.Seq;
             }
             catch (Exception ex)
             {
@@ -104,6 +121,7 @@ namespace Tweet_App_API.Services
 
             userResponse.Email = user.Email;
             userResponse.LoginId = user.LoginId;
+            userResponse.Seq = user.Seq;
 
             //Create hash value of entered password
             var newHashValue = CryptoGraphy.GetHash(password);

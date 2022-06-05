@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
@@ -12,7 +13,10 @@ using Tweet_App_API.Services;
 
 namespace Tweet_App_API.Controllers
 {
+
+  
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [EnableCors]
     [Route("[controller]")]
     [ApiController]
     public class TweetsController : ControllerBase
@@ -74,12 +78,13 @@ namespace Tweet_App_API.Controllers
             return BadRequest("Invalid Model");
         }
 
-
+        [AllowAnonymous]
         [HttpGet("users/all")]
-        public async Task<IActionResult> GetAllUsers()
+        public async Task<List<UserViewModel>> GetAllUsers()
         {
             //Return all users
-            return Ok(await _userService.GetAllUsers());
+            var response = await _userService.GetAllUsers();
+            return response;
         }
 
         [HttpGet("search/{username}")]
@@ -92,7 +97,8 @@ namespace Tweet_App_API.Controllers
         }
 
 
-        [Authorize(Policy = "whocanedit")]
+      //  [Authorize(Policy = "whocanedit")]
+    //  [AllowAnonymous]
         [HttpPost("{userName}/Add")]
         public async Task<IActionResult> CreateTweet(string userName, Tweet tweet)
         {
@@ -118,7 +124,8 @@ namespace Tweet_App_API.Controllers
         [HttpGet("all")]
         public List<Tweet> GetAllTweet()
         {
-            return _tweetService.GetAll();
+            var res = _tweetService.GetAll();
+            return res;
         }
 
         [HttpGet("{userName}")]
@@ -185,6 +192,14 @@ namespace Tweet_App_API.Controllers
                 _logger.LogInformation(ex.ToString());
                 return BadRequest(ex.ToString());
             }
+        }
+
+        [HttpGet("tweetId/{id}")]
+        public async Task<IActionResult> GetTweetByTweetId(string id)
+        {
+            var tweet = await _tweetService.GetTweetByTweetId(id);
+
+            return Ok(tweet);
         }
     }
 }
