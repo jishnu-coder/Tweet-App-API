@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Tweet_App_API.DataBaseLayer;
+using Tweet_App_API.Kafka;
 using Tweet_App_API.Model;
 using Tweet_App_API.TokenHandler;
 
@@ -70,7 +71,7 @@ namespace Tweet_App_API.Services
             var responsse = new UserResponse() { Email = usr.Email, LoginId = usr.LoginId, Errors = new List<string>() };
 
             var exisitingRecords = await GetAllUsers();
-            if(!exisitingRecords.Any())
+            if(exisitingRecords == null || !exisitingRecords.Any())
             {
                 usr.Seq = 0;
             }
@@ -133,6 +134,8 @@ namespace Tweet_App_API.Services
                 var tokenResponse = jwtAuthenticationManager.Authenticate(user.Email, user.Password);
                 userResponse.Token = tokenResponse.Token;
                 userResponse.RefreshToken = tokenResponse.RefreshToken;
+
+              
                 return userResponse;
             }
 

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Tweet_App_API.DataBaseLayer;
 using Tweet_App_API.Exceptions;
+using Tweet_App_API.Kafka;
 using Tweet_App_API.Model;
 
 namespace Tweet_App_API.Services
@@ -44,6 +45,8 @@ namespace Tweet_App_API.Services
                 tweet.Replys = tweet.Replys == null ? new List<TweetReply>() { } : tweet.Replys;
 
                 await _tweet.InsertOneAsync(tweet);
+
+                await KafkaProducer.KafkaProducerConfig(tweet.Content);
             }
 
             return await GetTweetByTweetId(tweet.TweetId);
@@ -51,6 +54,7 @@ namespace Tweet_App_API.Services
 
         public List<Tweet> GetAll()
         {
+           
             var tweetList = _tweet.AsQueryable().OrderByDescending(x => x.CreateTime).ToList();
 
             foreach(var tweet in tweetList)
@@ -113,6 +117,8 @@ namespace Tweet_App_API.Services
                 var update = Builders<Tweet>.Update.Set("content", tweet.Content).
                            Set("tags", tweet.Tags).Set("createTime", tweet.CreateTime);
                 await _tweet.FindOneAndUpdateAsync<Tweet>(filter, update);
+
+                await KafkaProducer.KafkaProducerConfig($"{userName} updat the tweet with content {tweet.Content}");
             }
 
             var updatedTweet = await GetTweetByTweetId(tweet.TweetId);
@@ -124,6 +130,8 @@ namespace Tweet_App_API.Services
         {
 
             var result = await _tweet.DeleteOneAsync<Tweet>(x => x.TweetId == tweetid);
+
+            await KafkaProducer .KafkaProducerConfig($"Delete the tweet {tweetid}");
             return result;
 
         }
@@ -146,6 +154,8 @@ namespace Tweet_App_API.Services
 
                 await _tweet.FindOneAndUpdateAsync<Tweet>(filter, update);
 
+                await KafkaProducer .KafkaProducerConfig($"{userId} Like the tweet {tweetId}");
+
                 return await GetTweetByTweetId(tweetId);
             }
 
@@ -164,6 +174,8 @@ namespace Tweet_App_API.Services
                 var update = Builders<Tweet>.Update.AddToSet("replys", replyTweet);
 
                 await _tweet.FindOneAndUpdateAsync<Tweet>(filter, update);
+
+                await KafkaProducer .KafkaProducerConfig($"{userId} Reply the tweet {tweetId} with Reply message {replyTweet.ReplyMessage}");
 
             }
             return await GetTweetByTweetId(tweetId);
@@ -209,7 +221,7 @@ namespace Tweet_App_API.Services
             return true;
         }
 
-        private static string TweetTimeStamp (DateTime createTime)
+        public static string TweetTimeStamp (DateTime createTime)
         {
             TimeSpan ts = DateTime.Now - createTime;
 

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -10,12 +11,14 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using MongoDB.Driver;
+using Prometheus;
 using System.Text;
 using Tweet_App_API.CustomAuthorization;
 using Tweet_App_API.DataBaseLayer;
 using Tweet_App_API.Model;
 using Tweet_App_API.Services;
 using Tweet_App_API.TokenHandler;
+
 
 namespace Tweet_App_API
 {
@@ -31,6 +34,7 @@ namespace Tweet_App_API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            
             services.AddCors(options =>
             {
                 options.AddPolicy("AllowAllHeaders",
@@ -95,6 +99,7 @@ namespace Tweet_App_API
 
             services.AddControllers();
 
+       
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -112,6 +117,8 @@ namespace Tweet_App_API
             //   app.UseHttpsRedirection();
 
             app.UseRouting();
+            app.UseHttpMetrics();
+           
 
             app.UseAuthentication();
             app.UseCors(x => x
@@ -121,11 +128,14 @@ namespace Tweet_App_API
                .AllowCredentials());
 
             app.UseAuthorization();
+
+            app.UseMetricServer();
            
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                
             });
         }
     }

@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Tweet_App_API.Exceptions;
+using Tweet_App_API.Kafka;
 using Tweet_App_API.Model;
 using Tweet_App_API.Services;
 
@@ -36,9 +37,12 @@ namespace Tweet_App_API.Controllers
         [HttpPost("Register")]
         public async Task<IActionResult> Register(User user)
         {
+            _logger.LogInformation($"{user.Email} Sign Up Request");
             if (ModelState.IsValid)
             {
                 var result = await _userService.Register(user);
+
+                _logger.LogInformation($"{user.Email} suvccesfully Registed");
                 return Ok(result);
             }
             return BadRequest();
@@ -48,11 +52,12 @@ namespace Tweet_App_API.Controllers
         [HttpPost("Login")]
         public async Task<IActionResult> Login(UserLoginModel userLoginModel)
         {
+            _logger.LogInformation($"{userLoginModel.UserName} Log in request");
             if (ModelState.IsValid)
             {
                 var result = await _userService.LoginUser(userLoginModel.UserName, userLoginModel.Password);
 
-                _logger.LogInformation($"{userLoginModel.UserName} User Login Request");
+                _logger.LogInformation($"{userLoginModel.UserName} User succesfully log in");
 
                 return Ok(result);
             }
@@ -64,6 +69,7 @@ namespace Tweet_App_API.Controllers
         [HttpPost("{userName}/forget-Password")]
         public async Task<IActionResult> ResetPassWord(string userName, UserLoginModel userLoginModel)
         {
+            _logger.LogInformation($"{userLoginModel.UserName} Reset password Request");
             if (ModelState.IsValid)
             {
                 if (await _userService.ResetPassword(userLoginModel.UserName, userLoginModel.Password, userLoginModel.ContactNumber))
@@ -82,6 +88,7 @@ namespace Tweet_App_API.Controllers
         [HttpGet("users/all")]
         public async Task<List<UserViewModel>> GetAllUsers()
         {
+            _logger.LogInformation(" Get All users Request");
             //Return all users
             var response = await _userService.GetAllUsers();
             return response;
@@ -97,8 +104,7 @@ namespace Tweet_App_API.Controllers
         }
 
 
-      //  [Authorize(Policy = "whocanedit")]
-    //  [AllowAnonymous]
+     
         [HttpPost("{userName}/Add")]
         public async Task<IActionResult> CreateTweet(string userName, Tweet tweet)
         {
@@ -109,6 +115,7 @@ namespace Tweet_App_API.Controllers
                     var result = await _tweetService.PostTweet(tweet);
 
                     _logger.LogInformation($"{userName} sucessfully create a tweet with id {result.TweetId}");
+                   
 
                     return Ok("Tweet Posted Succesfully");
                 }
@@ -152,7 +159,7 @@ namespace Tweet_App_API.Controllers
             {
                 var result = await _tweetService.UpdateTweet(userName, id, tweet);
 
-                _logger.LogInformation($"{userName} suucessfully Update the tweet {id}");
+                _logger.LogInformation($"{userName} sucessfully Update the tweet {id}");
 
                 return Ok(result);
             }
@@ -168,6 +175,7 @@ namespace Tweet_App_API.Controllers
         [HttpDelete("{userName}/delete/{id}")]
         public async Task<DeleteResult> DeleteTweet(string userName, string id)
         {
+            _logger.LogInformation($"{userName} sucessfully Delete the tweet {id}");
             return await _tweetService.DeleteTweet(id);
         }
 
@@ -175,6 +183,7 @@ namespace Tweet_App_API.Controllers
         [HttpPut("{userName}/Like/{id}")]
         public async Task<Tweet> LikeTweet(string userName, string id)
         {
+            _logger.LogInformation($"{userName} sucessfully Liked the tweet {id}");
             return await _tweetService.LikeTweet(userName, id);
         }
 
@@ -185,6 +194,7 @@ namespace Tweet_App_API.Controllers
             try
             {
                 var result = await _tweetService.ReplyTweet(userName, id, tweetReply);
+                _logger.LogInformation($"{userName} sucessfully Replied the tweet {id} with reply message {tweetReply.ReplyMessage}");
                 return Ok(result);
             }
             catch (Exception ex)

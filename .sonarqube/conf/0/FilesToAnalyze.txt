@@ -7,6 +7,7 @@ D:\FSE1\Tweet-App\Tweet-App-API\Tweet-App-API\DataBaseLayer\IDBClient.cs
 D:\FSE1\Tweet-App\Tweet-App-API\Tweet-App-API\Exceptions\InvalidTweetIdException.cs
 D:\FSE1\Tweet-App\Tweet-App-API\Tweet-App-API\Exceptions\InvalidUserNameException.cs
 D:\FSE1\Tweet-App\Tweet-App-API\Tweet-App-API\Exceptions\TweetLengthExceedException.cs
+D:\FSE1\Tweet-App\Tweet-App-API\Tweet-App-API\Kafka\KafkaProducer.cs
 D:\FSE1\Tweet-App\Tweet-App-API\Tweet-App-API\Model\TokenResponse.cs
 D:\FSE1\Tweet-App\Tweet-App-API\Tweet-App-API\Model\Tweet.cs
 D:\FSE1\Tweet-App\Tweet-App-API\Tweet-App-API\Model\TweetAppDBSettings.cs
@@ -26,10 +27,14 @@ D:\FSE1\Tweet-App\Tweet-App-API\Tweet-App-API\TokenHandler\IJwtAuthenticationMan
 D:\FSE1\Tweet-App\Tweet-App-API\Tweet-App-API\TokenHandler\IRefreshTokenGenerator.cs
 D:\FSE1\Tweet-App\Tweet-App-API\Tweet-App-API\TokenHandler\JwtAuthenticationManager.cs
 D:\FSE1\Tweet-App\Tweet-App-API\Tweet-App-API\TokenHandler\RefreshTokenGenerator.cs
+D:\FSE1\Tweet-App\Tweet-App-API\Tweet-App-API\WebHookHub\NotifyMessage.cs
 D:\FSE1\Tweet-App\Tweet-App-API\Tweet-App-API\obj\Debug\net5.0\.NETCoreApp,Version=v5.0.AssemblyAttributes.cs
 D:\FSE1\Tweet-App\Tweet-App-API\Tweet-App-API\obj\Debug\net5.0\Tweet-App-API.AssemblyInfo.cs
 D:\FSE1\Tweet-App\Tweet-App-API\Tweet-App-API\obj\Debug\net5.0\Tweet-App-API.MvcApplicationPartsAssemblyInfo.cs
 D:\FSE1\Tweet-App\Tweet-App-API\Tweet-App-API\log4net.config
 D:\FSE1\Tweet-App\Tweet-App-API\Tweet-App-API\appsettings.Development.json
 D:\FSE1\Tweet-App\Tweet-App-API\Tweet-App-API\appsettings.json
+D:\FSE1\Tweet-App\Tweet-App-API\Tweet-App-API\Dockerfile
+D:\FSE1\Tweet-App\Tweet-App-API\Tweet-App-API\Dockerfile.original
 D:\FSE1\Tweet-App\Tweet-App-API\Tweet-App-API\Properties\launchSettings.json
+D:\FSE1\Tweet-App\Tweet-App-API\.dockerignore

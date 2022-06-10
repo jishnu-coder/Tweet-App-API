@@ -180,7 +180,7 @@ namespace Tweet_App_APT_TestFixture
             var response = tweetController.GetAllUsers();
             //var response = userService.Get();
 
-            response.Result.Should().BeOfType(typeof(OkObjectResult));
+            response.Result.Should().BeNull();
         }
 
         [Test]

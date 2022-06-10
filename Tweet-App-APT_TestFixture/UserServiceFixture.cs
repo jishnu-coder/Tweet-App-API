@@ -126,9 +126,42 @@ namespace Tweet_App_APT_TestFixture
                 LastName = "User",
                 Email = "test@gmail.com",
                 LoginId = "test123",
-                Password = "password"
+                Password="test"
 
             };
+            var userList = new List<User>();
+            userList.Add(new User()
+            {
+                FirstName = "Test1",
+                LastName = "User",
+                Email = "test1@gmail.com",
+                LoginId = "test1"
+
+            });
+
+            userList.Add(new User()
+            {
+                FirstName = "Test2",
+                LastName = "User",
+                Email = "test2@gmail.com",
+                LoginId = "test2"
+
+            });
+
+            Mock<IAsyncCursor<User>> _userCursor = new Mock<IAsyncCursor<User>>();
+
+            //mock movenext
+            _userCursor.Setup(_ => _.Current).Returns(userList);
+            _userCursor
+                .SetupSequence(_ => _.MoveNextAsync(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(true)
+                .ReturnsAsync(false);
+
+            _users.Setup(op => op.FindAsync<User>(It.IsAny<FilterDefinition<User>>(),
+                            It.IsAny<FindOptions<User, User>>(),
+                            It.IsAny<CancellationToken>())).ReturnsAsync(_userCursor.Object);
+
+         
 
 
             _users.Setup(x => x.InsertOneAsync(It.IsAny<User>(), It.IsAny<InsertOneOptions>(), It.IsAny<CancellationToken>()))

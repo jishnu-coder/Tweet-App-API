@@ -41,7 +41,7 @@ namespace Tweet_App_APT_TestFixture
             tweetList.Add(new Tweet()
             {
                 TweetId = new Guid("9D2B0228-4D0D-4C23-8B49-01A698857709").ToString(),
-                CreatorId = "jishnu123",
+                Creator= new Creator { CreatorId = "jishnu123" },
                 Content = "New Content",
                 Tags = new List<string>(),
                 Likes = new List<string>(),
@@ -68,7 +68,7 @@ namespace Tweet_App_APT_TestFixture
 
             var tweetService = new TweetService(_Client.Object, _guid.Object, _userService.Object);
 
-            var response = tweetService.PostTweet(new Tweet() { Content = "New Content", });
+            var response = tweetService.PostTweet(new Tweet() { Content = "New Content", Creator = new Creator() { CreatorId = "jishnu123" } });
 
             response.Result.TweetId.Should().Be(new Guid("9D2B0228-4D0D-4C23-8B49-01A698857709").ToString());
 
@@ -82,7 +82,7 @@ namespace Tweet_App_APT_TestFixture
             tweetList.Add(new Tweet()
             {
                 TweetId = new Guid("9D2B0228-4D0D-4C23-8B49-01A698857709").ToString(),
-                CreatorId = "jishnu123",
+                Creator = new Creator { CreatorId = "jishnu123" },
                 Content = "New Content",
                 Tags = new List<string>(),
                 Likes = new List<string>(),
@@ -122,7 +122,7 @@ namespace Tweet_App_APT_TestFixture
             tweetList.Add(new Tweet()
             {
                 TweetId = new Guid("9D2B0228-4D0D-4C23-8B49-01A698857709").ToString(),
-                CreatorId = "jishnu123",
+                Creator = new Creator { CreatorId = "jishnu123" },
                 Content = "New Content",
                 Tags = new List<string>(),
                 Likes = new List<string>(),
@@ -153,7 +153,7 @@ namespace Tweet_App_APT_TestFixture
             var response = tweetService.UpdateTweet("test", "9D2B0228-4D0D-4C23-8B49-01A698857709", new Tweet()
             {
                 TweetId = new Guid("9D2B0228-4D0D-4C23-8B49-01A698857709").ToString(),
-                CreatorId = "jishnu123",
+                Creator = new Creator { CreatorId = "jishnu123" },
                 Content = "New Content",
                 Tags = new List<string>(),
                 Likes = new List<string>(),
@@ -172,7 +172,7 @@ namespace Tweet_App_APT_TestFixture
             tweetList.Add(new Tweet()
             {
                 TweetId = new Guid("9D2B0228-4D0D-4C23-8B49-01A698857709").ToString(),
-                CreatorId = "jishnu123",
+                Creator = new Creator { CreatorId = "jishnu123" },
                 Content = "New Content",
                 Tags = new List<string>(),
                 Likes = new List<string>(),
@@ -211,7 +211,7 @@ namespace Tweet_App_APT_TestFixture
             tweetList.Add(new Tweet()
             {
                 TweetId = new Guid("9D2B0228-4D0D-4C23-8B49-01A698857709").ToString(),
-                CreatorId = "jishnu123",
+                Creator = new Creator { CreatorId = "jishnu123" },
                 Content = "New Content",
                 Tags = new List<string>(),
                 Likes = new List<string>(),
@@ -273,6 +273,28 @@ namespace Tweet_App_APT_TestFixture
             var tweetService = new TweetService(_Client.Object, _guid.Object, _userService.Object);
             var result = tweetService.isValidTweet("1234");
             result.Exception.Should().NotBeNull();
+
+        }
+
+        [Test]
+        public void TweetTimeStampTest()
+        {
+            var result1 = TweetService.TweetTimeStamp(DateTime.Now);
+
+            result1.Should().Be("Just Now");
+
+            var result2 = TweetService.TweetTimeStamp(DateTime.Now.AddMinutes(-30));
+
+            result2.Should().Be("30 Minutes ago");
+
+            var result3 = TweetService.TweetTimeStamp(DateTime.Now.AddMinutes(-65));
+
+            result3.Should().Be("1 Hours ago");
+
+            var result4 = TweetService.TweetTimeStamp(DateTime.Now.AddDays(-1));
+
+            result4.Should().Be("1 Days ago");
+
 
         }
     }
