@@ -114,7 +114,7 @@ namespace Tweet_App_API
 
            
 
-            //   app.UseHttpsRedirection();
+           
 
             app.UseRouting();
             app.UseHttpMetrics();

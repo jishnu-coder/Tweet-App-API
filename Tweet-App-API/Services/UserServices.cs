@@ -58,7 +58,7 @@ namespace Tweet_App_API.Services
             return userViewModel;
         }
 
-        private int GetNextSequence(List<UserViewModel> exisitingRecords)
+        private static int GetNextSequence(List<UserViewModel> exisitingRecords)
         {
            var preSeq = exisitingRecords.Max(x => x.Seq);
             return preSeq + 1;
