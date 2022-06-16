@@ -16,12 +16,14 @@ namespace Tweet_App_API.Services
         private readonly IMongoCollection<Tweet> _tweet;
         private readonly IGuidService guidService;
         private readonly IUserServices userServices;
+        private readonly IKafkaProducer _kafkaProducer;
 
-        public TweetService(IDBClient client, IGuidService guidService, IUserServices userServices)
+        public TweetService(IDBClient client, IGuidService guidService, IUserServices userServices , IKafkaProducer kafkaProducer)
         {
             _tweet = client.GetTweetCollection();
             this.guidService = guidService;
             this.userServices = userServices;
+            _kafkaProducer = kafkaProducer;
         }
 
         public async Task<Tweet> PostTweet(Tweet tweet)
@@ -46,7 +48,7 @@ namespace Tweet_App_API.Services
 
                 await _tweet.InsertOneAsync(tweet);
 
-                await KafkaProducer.KafkaProducerConfig(tweet.Content);
+                await _kafkaProducer.KafkaProducerConfig(new Tweet() { Content = tweet.Content });
             }
 
             return await GetTweetByTweetId(tweet.TweetId);
@@ -57,19 +59,7 @@ namespace Tweet_App_API.Services
            
             var tweetList = _tweet.AsQueryable().OrderByDescending(x => x.CreateTime).ToList();
 
-            foreach(var tweet in tweetList)
-            {
-                tweet.DateTimeStamp = TweetTimeStamp(TimeZoneInfo.ConvertTimeFromUtc(tweet.CreateTime,TimeZoneInfo.FindSystemTimeZoneById("India Standard Time")));
-                
-                tweet.Replys = tweet.Replys.OrderByDescending(x => x.Reply_Time).ToList();
-
-                foreach(var reply in tweet.Replys)
-                {
-                    reply.Reply_Time_Stamp = TweetTimeStamp(TimeZoneInfo.ConvertTimeFromUtc(reply.Reply_Time, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time")));
-                }
-
-
-            }
+            tweetList = tweetList.Any() ? ReformTweetObject(tweetList) : tweetList;
 
             return tweetList;
         }
@@ -88,20 +78,9 @@ namespace Tweet_App_API.Services
 
             data = data.OrderByDescending(x => x.CreateTime).ToList();
 
-            foreach (var tweet in data)
-            {
-                tweet.DateTimeStamp = TweetTimeStamp(TimeZoneInfo.ConvertTimeFromUtc(tweet.CreateTime, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time")));
+            data = data.Any() ? ReformTweetObject(data) : data;
 
-                tweet.Replys = tweet.Replys.OrderByDescending(x => x.Reply_Time).ToList();
-
-                foreach (var reply in tweet.Replys)
-                {
-                    reply.Reply_Time_Stamp = TweetTimeStamp(TimeZoneInfo.ConvertTimeFromUtc(reply.Reply_Time, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time")));
-                }
-
-
-            }
-
+          
             return data;
 
         }
@@ -118,7 +97,7 @@ namespace Tweet_App_API.Services
                            Set("tags", tweet.Tags).Set("createTime", tweet.CreateTime);
                 await _tweet.FindOneAndUpdateAsync<Tweet>(filter, update);
 
-                await KafkaProducer.KafkaProducerConfig($"{userName} updat the tweet with content {tweet.Content}");
+                await _kafkaProducer.KafkaProducerConfig(new Tweet() { Content = $"{userName} updat the tweet with content {tweet.Content}" });
             }
 
             var updatedTweet = await GetTweetByTweetId(tweet.TweetId);
@@ -131,7 +110,7 @@ namespace Tweet_App_API.Services
 
             var result = await _tweet.DeleteOneAsync<Tweet>(x => x.TweetId == tweetid);
 
-            await KafkaProducer .KafkaProducerConfig($"Delete the tweet {tweetid}");
+            await _kafkaProducer.KafkaProducerConfig(new Tweet() { Content = $"Delete the tweet {tweetid}" });
             return result;
 
         }
@@ -154,7 +133,7 @@ namespace Tweet_App_API.Services
 
                 await _tweet.FindOneAndUpdateAsync<Tweet>(filter, update);
 
-                await KafkaProducer .KafkaProducerConfig($"{userId} Like the tweet {tweetId}");
+                await _kafkaProducer.KafkaProducerConfig(new Tweet { Content = $"{userId} Like the tweet {tweetId}" });
 
                 return await GetTweetByTweetId(tweetId);
             }
@@ -175,7 +154,7 @@ namespace Tweet_App_API.Services
 
                 await _tweet.FindOneAndUpdateAsync<Tweet>(filter, update);
 
-                await KafkaProducer .KafkaProducerConfig($"{userId} Reply the tweet {tweetId} with Reply message {replyTweet.ReplyMessage}");
+                await _kafkaProducer.KafkaProducerConfig( new Tweet() { Content = $"{userId} Reply the tweet {tweetId} with Reply message {replyTweet.ReplyMessage}" });
 
             }
             return await GetTweetByTweetId(tweetId);
@@ -203,7 +182,7 @@ namespace Tweet_App_API.Services
 
         }
 
-        private static bool TweetLengthAndTagLengthValidation(string content, List<string> tags)
+        public static bool TweetLengthAndTagLengthValidation(string content, List<string> tags)
         {
             foreach (var tag in tags)
             {
@@ -219,6 +198,25 @@ namespace Tweet_App_API.Services
             }
 
             return true;
+        }
+
+        public static List<Tweet> ReformTweetObject(List<Tweet> data)
+        {
+            foreach (var tweet in data)
+            {
+                tweet.DateTimeStamp = TweetTimeStamp(TimeZoneInfo.ConvertTimeFromUtc(tweet.CreateTime, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time")));
+
+                tweet.Replys = tweet.Replys.OrderByDescending(x => x.Reply_Time).ToList();
+
+                foreach (var reply in tweet.Replys)
+                {
+                    reply.Reply_Time_Stamp = TweetTimeStamp(TimeZoneInfo.ConvertTimeFromUtc(reply.Reply_Time, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time")));
+                }
+
+
+            }
+
+            return data;
         }
 
         public static string TweetTimeStamp (DateTime createTime)

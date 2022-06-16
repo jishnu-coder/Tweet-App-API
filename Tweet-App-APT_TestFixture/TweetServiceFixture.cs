@@ -5,8 +5,10 @@ using Moq;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using Tweet_App_API.DataBaseLayer;
+using Tweet_App_API.Kafka;
 using Tweet_App_API.Model;
 using Tweet_App_API.Services;
 
@@ -19,6 +21,7 @@ namespace Tweet_App_APT_TestFixture
         Mock<IDBClient> _Client;
         Mock<IMongoQueryable<Tweet>> _mongoQueryableMock;
         Mock<IUserServices> _userService;
+        Mock<IKafkaProducer> _kafkaProducer;
 
 
 
@@ -30,6 +33,9 @@ namespace Tweet_App_APT_TestFixture
             _Client = new Mock<IDBClient>();
             _mongoQueryableMock = new Mock<IMongoQueryable<Tweet>>();
             _userService = new Mock<IUserServices>();
+            _kafkaProducer = new Mock<IKafkaProducer>();
+
+            _kafkaProducer.Setup(x => x.KafkaProducerConfig(It.IsAny<Tweet>())).ReturnsAsync(true);
 
         }
 
@@ -41,7 +47,7 @@ namespace Tweet_App_APT_TestFixture
             tweetList.Add(new Tweet()
             {
                 TweetId = new Guid("9D2B0228-4D0D-4C23-8B49-01A698857709").ToString(),
-                Creator= new Creator { CreatorId = "jishnu123" },
+                Creator = new Creator { CreatorId = "jishnu123" },
                 Content = "New Content",
                 Tags = new List<string>(),
                 Likes = new List<string>(),
@@ -66,7 +72,7 @@ namespace Tweet_App_APT_TestFixture
 
             _Client.Setup(x => x.GetTweetCollection()).Returns(_tweet.Object);
 
-            var tweetService = new TweetService(_Client.Object, _guid.Object, _userService.Object);
+            var tweetService = new TweetService(_Client.Object, _guid.Object, _userService.Object, _kafkaProducer.Object);
 
             var response = tweetService.PostTweet(new Tweet() { Content = "New Content", Creator = new Creator() { CreatorId = "jishnu123" } });
 
@@ -93,21 +99,20 @@ namespace Tweet_App_APT_TestFixture
 
             //mock movenext
             _tweetCursor.Setup(_ => _.Current).Returns(tweetList);
-            _tweetCursor
-                .SetupSequence(_ => _.MoveNextAsync(It.IsAny<CancellationToken>()))
-                .ReturnsAsync(true)
-                .ReturnsAsync(false);
+           
 
             _tweet.Setup(op => op.FindAsync<Tweet>(It.IsAny<FilterDefinition<Tweet>>(),
                             It.IsAny<FindOptions<Tweet, Tweet>>(),
                             It.IsAny<CancellationToken>())).ReturnsAsync(_tweetCursor.Object);
+
+
 
             _guid.Setup(x => x.NewGuid()).Returns(new Guid("9D2B0228-4D0D-4C23-8B49-01A698857709"));
             _userService.Setup(x => x.GetUserByEmail(It.IsAny<string>())).ReturnsAsync(new UserViewModel() { });
 
             _Client.Setup(x => x.GetTweetCollection()).Returns(_tweet.Object);
 
-            var tweetService = new TweetService(_Client.Object, _guid.Object, _userService.Object);
+            var tweetService = new TweetService(_Client.Object, _guid.Object, _userService.Object, _kafkaProducer.Object);
 
             var response = tweetService.GetTweetsByUserId("jishnu123");
 
@@ -148,7 +153,7 @@ namespace Tweet_App_APT_TestFixture
 
             _Client.Setup(x => x.GetTweetCollection()).Returns(_tweet.Object);
 
-            var tweetService = new TweetService(_Client.Object, _guid.Object, _userService.Object);
+            var tweetService = new TweetService(_Client.Object, _guid.Object, _userService.Object, _kafkaProducer.Object);
 
             var response = tweetService.UpdateTweet("test", "9D2B0228-4D0D-4C23-8B49-01A698857709", new Tweet()
             {
@@ -196,7 +201,7 @@ namespace Tweet_App_APT_TestFixture
 
             _Client.Setup(x => x.GetTweetCollection()).Returns(_tweet.Object);
 
-            var tweetService = new TweetService(_Client.Object, _guid.Object, _userService.Object);
+            var tweetService = new TweetService(_Client.Object, _guid.Object, _userService.Object, _kafkaProducer.Object);
 
             var response = tweetService.LikeTweet("jishnu@gmail.com", "9D2B0228-4D0D-4C23-8B49-01A698857709");
 
@@ -237,7 +242,7 @@ namespace Tweet_App_APT_TestFixture
 
             _Client.Setup(x => x.GetTweetCollection()).Returns(_tweet.Object);
 
-            var tweetService = new TweetService(_Client.Object, _guid.Object, _userService.Object);
+            var tweetService = new TweetService(_Client.Object, _guid.Object, _userService.Object, _kafkaProducer.Object);
 
             var response = tweetService.ReplyTweet("jishnu@gmail.com", "9D2B0228-4D0D-4C23-8B49-01A698857709", new TweetReply() { Replied_userId = "jishnu@gmail.com", ReplyMessage = "Super..." });
 
@@ -251,7 +256,7 @@ namespace Tweet_App_APT_TestFixture
             _tweet.Setup(x => x.DeleteOneAsync(It.IsAny<FilterDefinition<Tweet>>(), It.IsAny<CancellationToken>())).ReturnsAsync(deleteResult.Object);
             _Client.Setup(x => x.GetTweetCollection()).Returns(_tweet.Object);
 
-            var tweetService = new TweetService(_Client.Object, _guid.Object, _userService.Object);
+            var tweetService = new TweetService(_Client.Object, _guid.Object, _userService.Object, _kafkaProducer.Object);
 
             var result = tweetService.DeleteTweet("12344");
 
@@ -261,7 +266,7 @@ namespace Tweet_App_APT_TestFixture
         [Test]
         public void IsValidUserTestWithException()
         {
-            var tweetService = new TweetService(_Client.Object, _guid.Object, _userService.Object);
+            var tweetService = new TweetService(_Client.Object, _guid.Object, _userService.Object, _kafkaProducer.Object);
             var result = tweetService.isValidUser("test");
             result.Exception.Should().NotBeNull();
 
@@ -270,7 +275,7 @@ namespace Tweet_App_APT_TestFixture
         [Test]
         public void IsValidTweetTestWithException()
         {
-            var tweetService = new TweetService(_Client.Object, _guid.Object, _userService.Object);
+            var tweetService = new TweetService(_Client.Object, _guid.Object, _userService.Object, _kafkaProducer.Object);
             var result = tweetService.isValidTweet("1234");
             result.Exception.Should().NotBeNull();
 
@@ -297,5 +302,76 @@ namespace Tweet_App_APT_TestFixture
 
 
         }
+
+        [Test]
+        public void ReformTweetObjectTest()
+        {
+            var result = TweetService.ReformTweetObject(new List<Tweet>() { new Tweet() {
+                      CreateTime=DateTime.UtcNow,
+                      Replys=new List<TweetReply>(){
+                        new TweetReply()
+                        {
+                            Reply_Time=DateTime.UtcNow
+                        }
+                      }
+            } });
+
+            result.Should().HaveCount(1);
+
+
+        }
+
+        [Test]
+        public void TweetLengthAndTagLengthValidationFixtureWithException()
+        {
+            try
+            {
+                string content = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+                var tags = new List<string>() { "Test tag" };
+
+                var result = TweetService.TweetLengthAndTagLengthValidation(content, tags);
+            }
+            catch(Exception ex)
+            {
+                ex.Message.Should().Be("Tweet length should be less than 50 charactor");
+            }
+
+            
+
+            
+        }
+
+        [Test]
+        public void isValidTweetFixtureWithException()
+        {
+            var tweetList = new List<Tweet>() { };
+
+           
+
+            Mock<IAsyncCursor<Tweet>> _tweetCursor = new Mock<IAsyncCursor<Tweet>>();
+
+            //mock movenext
+            _tweetCursor.Setup(_ => _.Current).Returns(tweetList);
+            _tweetCursor
+                .SetupSequence(_ => _.MoveNextAsync(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(true)
+                .ReturnsAsync(false);
+
+            _tweet.Setup(op => op.FindAsync<Tweet>(It.IsAny<FilterDefinition<Tweet>>(),
+                            It.IsAny<FindOptions<Tweet, Tweet>>(),
+                            It.IsAny<CancellationToken>())).ReturnsAsync(_tweetCursor.Object);
+            _Client.Setup(x => x.GetTweetCollection()).Returns(_tweet.Object);
+
+
+            var tweetService = new TweetService(_Client.Object, _guid.Object, _userService.Object, _kafkaProducer.Object);
+
+            var result = tweetService.isValidTweet("1234");
+
+            result.Exception.Should().NotBeNull();
+         
+        }
     }
+
+   
 }
+

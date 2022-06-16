@@ -15,6 +15,7 @@ using Prometheus;
 using System.Text;
 using Tweet_App_API.CustomAuthorization;
 using Tweet_App_API.DataBaseLayer;
+using Tweet_App_API.Kafka;
 using Tweet_App_API.Model;
 using Tweet_App_API.Services;
 using Tweet_App_API.TokenHandler;
@@ -83,8 +84,14 @@ namespace Tweet_App_API
             services.Configure<TweetAppDBSettings>(
             Configuration.GetSection(nameof(TweetAppDBSettings)));
 
+            services.Configure<KafkaSettings>(
+            Configuration.GetSection(nameof(KafkaSettings)));
+
             services.AddSingleton<ITweetAppDBSettings>(sp =>
                 sp.GetRequiredService<IOptions<TweetAppDBSettings>>().Value);
+
+            services.AddSingleton<IKafkaSettings>(sp =>
+                sp.GetRequiredService<IOptions<KafkaSettings>>().Value);
 
             services.AddAutoMapper(typeof(Startup));
             services.AddSingleton<IDBClient, DBClient>();
@@ -94,6 +101,7 @@ namespace Tweet_App_API
             services.AddSingleton<IGuidService, GuidService>();
             services.AddSingleton<IJwtAuthenticationManager, JwtAuthenticationManager>();
             services.AddSingleton<IRefreshTokenGenerator, RefreshTokenGenerator>();
+            services.AddSingleton<IKafkaProducer, KafkaProducer>();
 
             services.AddSingleton<IMongoClient, MongoClient>(sp => new MongoClient(Configuration["TweetAppDBSettings:ConnectionString"]));
 

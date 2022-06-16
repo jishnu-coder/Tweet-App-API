@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Threading;
 using Tweet_App_API.Controllers;
 using Tweet_App_API.DataBaseLayer;
+using Tweet_App_API.Exceptions;
 using Tweet_App_API.Model;
 using Tweet_App_API.Services;
 using Tweet_App_API.TokenHandler;
@@ -207,6 +208,17 @@ namespace Tweet_App_APT_TestFixture
         }
 
         [Test]
+        public void CreateTweetTestException()
+        {
+
+            _tweetService.Setup(x => x.PostTweet(It.IsAny<Tweet>())).ThrowsAsync(new System.Exception());
+            var tweetController = new TweetsController(_logger.Object, _userService.Object, _tweetService.Object);
+
+            var response = tweetController.CreateTweet("test", new Tweet() { TweetId = "123456" });
+            response.Result.Should().BeOfType(typeof(BadRequestObjectResult));
+        }
+
+        [Test]
         public void CreateTweetTest_ModelStateInvalid()
         {
 
@@ -242,6 +254,28 @@ namespace Tweet_App_APT_TestFixture
         }
 
         [Test]
+        public void GetTweetByIdTestWithException()
+        {
+
+            _tweetService.Setup(x => x.GetTweetsByUserId(It.IsAny<string>())).ThrowsAsync(new InvalidUserNameException("Exception"));
+            var tweetController = new TweetsController(_logger.Object, _userService.Object, _tweetService.Object);
+
+            var response = tweetController.GetTweetById("12345");
+            response.Result.Should().BeOfType(typeof(BadRequestObjectResult));
+        }
+
+        [Test]
+        public void GetTweetByTweetIdTest()
+        {
+
+            _tweetService.Setup(x => x.GetTweetByTweetId(It.IsAny<string>())).ReturnsAsync( new Tweet() { TweetId = "1234567" } );
+            var tweetController = new TweetsController(_logger.Object, _userService.Object, _tweetService.Object);
+
+            var response = tweetController.GetTweetByTweetId("12345");
+            response.Result.Should().BeOfType(typeof(OkObjectResult));
+        }
+
+        [Test]
         public void UpdateTweetTest()
         {
 
@@ -250,6 +284,17 @@ namespace Tweet_App_APT_TestFixture
 
             var response = tweetController.UpdateTweet("test@gmail.com", "12344", new Tweet() { TweetId = "12345" });
             response.Result.Should().BeOfType(typeof(OkObjectResult));
+        }
+
+        [Test]
+        public void UpdateTweetTestWithException()
+        {
+
+            _tweetService.Setup(x => x.UpdateTweet(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Tweet>())).ThrowsAsync(new System.Exception());
+            var tweetController = new TweetsController(_logger.Object, _userService.Object, _tweetService.Object);
+
+            var response = tweetController.UpdateTweet("test@gmail.com", "12344", new Tweet() { TweetId = "12345" });
+            response.Result.Should().BeOfType(typeof(BadRequestObjectResult));
         }
 
         [Test]
@@ -283,6 +328,18 @@ namespace Tweet_App_APT_TestFixture
 
             var response = tweetController.ReplyTweet("test", "12345", new TweetReply() { Replied_userId = "test1", ReplyMessage = "new Reply" });
             response.Result.Should().BeOfType(typeof(OkObjectResult));
+        }
+
+
+        [Test]
+        public void ReplyTweetTestWithException()
+        {
+
+            _tweetService.Setup(x => x.ReplyTweet(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<TweetReply>())).ThrowsAsync(new System.Exception());
+            var tweetController = new TweetsController(_logger.Object, _userService.Object, _tweetService.Object);
+
+            var response = tweetController.ReplyTweet("test", "12345", new TweetReply() { Replied_userId = "test1", ReplyMessage = "new Reply" });
+            response.Result.Should().BeOfType(typeof(BadRequestObjectResult));
         }
     }
 }

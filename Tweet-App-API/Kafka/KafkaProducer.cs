@@ -5,14 +5,23 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Tweet_App_API.Model;
 
 namespace Tweet_App_API.Kafka
 {
-    public static class KafkaProducer
+  
+
+    public class KafkaProducer : IKafkaProducer
     {
-        public static async Task<bool> KafkaProducerConfig(string message)
+        private readonly IKafkaSettings _KafkaSettings;
+
+        public KafkaProducer(IKafkaSettings kafkaSettings)
         {
-            var config = new ProducerConfig { BootstrapServers = "localhost:29092" };
+            _KafkaSettings = kafkaSettings;
+        }
+        public  async Task<bool> KafkaProducerConfig(Tweet  tweet)
+        {
+            var config = new ProducerConfig { BootstrapServers = _KafkaSettings.BootstrapServers } ;
 
             // If serializers are not specified, default serializers from
             // `Confluent.Kafka.Serializers` will be automatically used where
@@ -21,7 +30,7 @@ namespace Tweet_App_API.Kafka
             {
                 try
                 {
-                    var dr = await p.ProduceAsync("test-topic", new Message<Null,string> { Value = message });
+                    var dr = await p.ProduceAsync(_KafkaSettings.Topic, new Message<Null,string> { Value = tweet.Content });
                     Console.WriteLine($"Message Delivered '{dr.Value}' to '{dr.TopicPartitionOffset}'");
                     return true;
                 }
