@@ -67,8 +67,19 @@ namespace Tweet_App_API.Services
 
         public async Task<UserResponse> Register(User usr)
         {
-            usr.LoginId = usr.FirstName + Guid.NewGuid().ToString();
             var responsse = new UserResponse() { Email = usr.Email, LoginId = usr.LoginId, Errors = new List<string>() };
+
+            var isemailexisit = await GetUserByEmail(usr.Email);
+            if(isemailexisit != null)
+            {
+                responsse.Errors.Add("Email is already exisit");
+                responsse.LoginId = null;
+
+                return responsse;
+            }
+
+            usr.LoginId = usr.FirstName + Guid.NewGuid().ToString();
+            
 
             var exisitingRecords = await GetAllUsers();
             if(exisitingRecords == null || !exisitingRecords.Any())

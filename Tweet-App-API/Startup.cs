@@ -130,7 +130,7 @@ namespace Tweet_App_API
 
             app.UseAuthentication();
             app.UseCors(x => x
-               .AllowAnyMethod()
+               .AllowAnyMethod()              
                .AllowAnyHeader()
                .SetIsOriginAllowed(origin => true) // allow any origin
                .AllowCredentials());

@@ -205,7 +205,7 @@ namespace Tweet_App_API.Services
         {
             foreach (var tweet in data)
             {
-                tweet.DateTimeStamp = TweetTimeStamp(TimeZoneInfo.ConvertTimeFromUtc(tweet.CreateTime, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time")));
+                tweet.DateTimeStamp = TweetTimeStamp(tweet.CreateTime);
 
                 tweet.Replys = tweet.Replys.OrderByDescending(x => x.Reply_Time).ToList();
 
