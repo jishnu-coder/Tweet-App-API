@@ -57,7 +57,8 @@ namespace Tweet_App_API.Services
         public List<Tweet> GetAll()
         {
            
-            var tweetList = _tweet.AsQueryable().OrderByDescending(x => x.CreateTime).ToList();
+            var tweetList = _tweet.AsQueryable().ToList();
+            tweetList = tweetList.OrderByDescending(x => x.CreateTime).ToList();
 
             tweetList = tweetList.Any() ? ReformTweetObject(tweetList) : tweetList;
 
