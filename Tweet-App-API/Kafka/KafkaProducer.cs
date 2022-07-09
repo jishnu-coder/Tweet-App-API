@@ -36,6 +36,7 @@ namespace Tweet_App_API.Kafka
 
             return true;
 
+
             var config = new ProducerConfig { BootstrapServers = _KafkaSettings.BootstrapServers } ;
 
             // If serializers are not specified, default serializers from
