@@ -211,7 +211,7 @@ namespace Tweet_App_API.Services
 
                 foreach (var reply in tweet.Replys)
                 {
-                    reply.Reply_Time_Stamp = TweetTimeStamp(TimeZoneInfo.ConvertTimeFromUtc(reply.Reply_Time, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time")));
+                    reply.Reply_Time_Stamp = TweetTimeStamp(reply.Reply_Time);
                 }
 
 

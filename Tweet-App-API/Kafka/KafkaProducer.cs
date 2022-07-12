@@ -23,7 +23,7 @@ namespace Tweet_App_API.Kafka
         }
         public  async Task<bool> KafkaProducerConfig(Tweet  tweet)
         {
-            var conn = "Endpoint=sb://tweet-app-eventhub-namespace.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=xdqaImzDOIIJt2q6EIelMG6cn1Rv4LxDDg/WE6mw+rQ=";
+            var conn = "Endpoint=sb://tweet-app-event-hub-namespace.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=wePGXfdhFla/mS4/igrixzLHoUeqtStobAB2RVfCBks=";
             var hubname = "tweet-app-event-hub";
 
             EventHubProducerClient producerClient = new EventHubProducerClient(conn, hubname);
@@ -36,27 +36,6 @@ namespace Tweet_App_API.Kafka
 
             return true;
 
-
-            var config = new ProducerConfig { BootstrapServers = _KafkaSettings.BootstrapServers } ;
-
-            // If serializers are not specified, default serializers from
-            // `Confluent.Kafka.Serializers` will be automatically used where
-            // available. Note: by default strings are encoded as UTF8.
-            using (var p = new ProducerBuilder<Null, string>(config).Build())
-            {
-                try
-                {
-                    var dr = await p.ProduceAsync(_KafkaSettings.Topic, new Message<Null,string> { Value = tweet.Content });
-                    Console.WriteLine($"Message Delivered '{dr.Value}' to '{dr.TopicPartitionOffset}'");
-                    return true;
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine($"Delivery failed: {e.Message}");
-
-                }
-            }
-            return false;
         }
 
        

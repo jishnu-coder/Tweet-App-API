@@ -78,7 +78,7 @@ namespace Tweet_App_API.Services
                 return responsse;
             }
 
-            usr.LoginId = usr.FirstName + Guid.NewGuid().ToString();
+            responsse.LoginId = usr.FirstName + Guid.NewGuid().ToString();
             
 
             var exisitingRecords = await GetAllUsers();
